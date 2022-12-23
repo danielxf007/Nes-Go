@@ -1,13 +1,21 @@
 package memory
 
-type linearMemory struct {
-	data uint8[]
+//This type of memory only holds bytes and is volatile
+type LinearMemory struct {
+	Data []byte
 }
 
-type reader interface {
-	read(address uint8) (uint8)
+func (memory* LinearMemory) Read(address byte) byte {
+	return memory.Data[address]
 }
 
-func (memory *linearMemory) read(address uint8) (uint8) {
-	return 0x00
+func (memory* LinearMemory) Write(address byte, value byte) {
+	memory.Data[address] = value
 }
+
+func (memory* LinearMemory) Reset() {
+	for i := range memory.Data {
+		memory.Data[i] = 0
+	}
+}
+
