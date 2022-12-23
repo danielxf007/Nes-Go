@@ -2,12 +2,11 @@ package main
 
 import (
 	"fmt"
-	"memory"
+	"nes_go/memory"
 )
 
 func main() {
-
-	ram := new(linearMemory)
-	ram.data = make([]uint8, 0x2000, 0x2000)
-	fmt.Println(ram)
+	ram := new(memory.LinearMemory)
+	ram.Data = make([]uint8, 5, 5)
+	fmt.Println(ram.Read(0x00))
 }
