@@ -15,6 +15,7 @@ func TestLoadRom(t *testing.T) {
 		if err != nil {
 			t.Log(err)
 		}else {
+			rom.PrintHeader()
 			t.Log("The file was loaded")
 		}
 	}
