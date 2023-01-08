@@ -31,6 +31,7 @@ var func_table [0xFF]func(cpu* CPU) uint16
 
 func init() {
 	func_table = [0xFF]func(cpu* CPU) uint16{}
+	//AND
 	func_table[0x29] = ANDImmediate
 	func_table[0x25] = ANDZeroPage
 	func_table[0x35] = ANDZeroPageX
@@ -39,4 +40,13 @@ func init() {
 	func_table[0x39] = ANDAbsoluteY
 	func_table[0x21] = ANDIndirectX
 	func_table[0x31] = ANDIndirectY
+	//ORA
+	func_table[0x09] = ORAImmediate
+	func_table[0x05] = ORAZeroPage
+	func_table[0x15] = ORAZeroPageX
+	func_table[0x0D] = ORAAbsolute
+	func_table[0x1D] = ORAAbsoluteX
+	func_table[0x19] = ORAAbsoluteY
+	func_table[0x01] = ORAIndirectX
+	func_table[0x11] = ORAIndirectY
 }
