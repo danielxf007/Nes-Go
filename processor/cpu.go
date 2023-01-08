@@ -31,6 +31,12 @@ var func_table [0xFF]func(cpu* CPU) uint16
 
 func init() {
 	func_table = [0xFF]func(cpu* CPU) uint16{}
+	//ASL
+	func_table[0x0A] = ASLA
+	func_table[0x06] = ASLZeroPage
+	func_table[0x16] = ASLZeroPageX
+	func_table[0x0E] = ASLAbsolute
+	func_table[0x1E] = ASLAbsoluteX
 	//AND
 	func_table[0x29] = ANDImmediate
 	func_table[0x25] = ANDZeroPage
