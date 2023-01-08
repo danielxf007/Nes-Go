@@ -2,7 +2,6 @@ package memory
 
 import (
 	"errors"
-	"fmt"
 	"os"
 )
 
@@ -80,3 +79,17 @@ func (rom* Rom) Load(rom_path string) error {
 	rom.Data = data
 	return nil
 }
+
+func (rom* Rom) Read(address uint16) byte {
+	return 0x00
+}
+
+func (rom* Rom) Write(address uint16, value byte) {
+}
+
+func (rom* Rom) Reset() {
+}
+
+
+
+
