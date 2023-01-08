@@ -49,3 +49,7 @@ func GetIndirectYAddr(cpu* CPU) uint16 {
   return cpu.Addr.Increment(cpu.Y.Value)
 }
 
+//Bit
+func GetNBit(value byte, n byte) byte {
+  return (value >> n) & 0x01 
+}
