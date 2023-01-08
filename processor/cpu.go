@@ -32,4 +32,11 @@ var func_table [0xFF]func(cpu* CPU) uint16
 func init() {
 	func_table = [0xFF]func(cpu* CPU) uint16{}
 	func_table[0x29] = ANDImmediate
+	func_table[0x25] = ANDZeroPage
+	func_table[0x35] = ANDZeroPageX
+	func_table[0x2D] = ANDAbsolute
+	func_table[0x3D] = ANDAbsoluteX
+	func_table[0x39] = ANDAbsoluteY
+	func_table[0x21] = ANDIndirectX
+	func_table[0x31] = ANDIndirectY
 }
