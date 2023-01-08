@@ -18,7 +18,7 @@ func updateFlagsAND(cpu* CPU, result byte) {
 	}
 }
 
-func ExecuteAnd(cpu* CPU) {
+func ExecuteAND(cpu* CPU) {
 	value := cpu.Mapper.Read(cpu.Addr.ADH, cpu.Addr.ADL)
 	cpu.A.Value &= value
 	updateFlagsAND(cpu, cpu.A.Value)
@@ -26,49 +26,49 @@ func ExecuteAnd(cpu* CPU) {
 }
 
 func ANDImmediate(cpu* CPU) uint16 {
-  ExecuteAnd(cpu)
+  ExecuteAND(cpu)
 	return 2
 }
 
 func ANDZeroPage(cpu* CPU) uint16 {
   GetZeroPageAddr(cpu)
-  ExecuteAnd(cpu)
+  ExecuteAND(cpu)
 	return 2
 }
 
 func ANDZeroPageX(cpu* CPU) uint16 {
 	GetZeroPageXAddr(cpu)
-  ExecuteAnd(cpu)
+  ExecuteAND(cpu)
 	return 2
 }
 
 func ANDAbsolute(cpu* CPU) uint16 {
 	GetAbsoluteAddr(cpu)
-  ExecuteAnd(cpu)
+  ExecuteAND(cpu)
 	return 4
 }
 
 func ANDAbsoluteX(cpu* CPU) uint16 {
 	adjusted := GetAbsoluteXAddr(cpu)
-  ExecuteAnd(cpu)
+  ExecuteAND(cpu)
 	return 4 + adjusted
 }
 
 func ANDAbsoluteY(cpu* CPU) uint16 {
 	adjusted := GetAbsoluteYAddr(cpu)
-  ExecuteAnd(cpu)
+  ExecuteAND(cpu)
 	return 4 + adjusted
 }
 
 func ANDIndirectX(cpu* CPU) uint16 {
 	GetIndirectXAddr(cpu)
-  ExecuteAnd(cpu)
+  ExecuteAND(cpu)
 	return 6
 }
 
 func ANDIndirectY(cpu* CPU) uint16 {
 	adjusted := GetIndirectYAddr(cpu)
-  ExecuteAnd(cpu)
+  ExecuteAND(cpu)
 	return 5 + adjusted
 }
 
