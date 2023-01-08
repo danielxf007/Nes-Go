@@ -23,19 +23,19 @@ type ProgramCounterOperations interface {
 	SetADH(value byte)
 	SetADL(value byte)
 	//Increments the PC by value and returns 1 or 0 if ADL overflowed
-	Increment(value byte) byte
+	Increment(value byte) uint16
 	//Increments the PC by value and returns 1 or 0 if ADL underflowed
-	Decrement(value byte) byte
+	Decrement(value byte) uint16
 }
 
-func (pc* ProgramCounter) Increment(value byte) byte {
+func (pc* ProgramCounter) Increment(value byte) uint16 {
 	carry := byte((uint16(pc.ADL) + uint16(value)) >> 8)
 	pc.ADL += value
 	pc.ADH += carry
-	return carry
+	return uint16(carry)
 }
 
-func (pc* ProgramCounter) Decrement(value byte) byte {
+func (pc* ProgramCounter) Decrement(value byte) uint16 {
 	return 0
 }
 
