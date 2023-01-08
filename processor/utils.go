@@ -48,3 +48,4 @@ func GetIndirectYAddr(cpu* CPU) uint16 {
   cpu.Addr.ADH = cpu.Mapper.Read(0x00, aux_adl)
   return cpu.Addr.Increment(cpu.Y.Value)
 }
+
