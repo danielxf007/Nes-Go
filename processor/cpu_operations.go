@@ -9,6 +9,7 @@ func (addr* AddressBuffer) Increment(value byte) uint16 {
 
 //Boolean
 
+//AND
 func updateFlagsAND(cpu* CPU, result byte) {
 	cpu.P.N = (result & 0x80) >> 7
 	if result == 0x00 {
@@ -69,6 +70,70 @@ func ANDIndirectX(cpu* CPU) uint16 {
 func ANDIndirectY(cpu* CPU) uint16 {
 	adjusted := GetIndirectYAddr(cpu)
   ExecuteAND(cpu)
+	return 5 + adjusted
+}
+
+//ORA
+func updateFlagsORA(cpu* CPU, result byte) {
+	cpu.P.N = (result & 0x80) >> 7
+	if result == 0x00 {
+		cpu.P.Z = 1
+	}else {
+		cpu.P.Z = 0
+	}
+}
+
+func ExecuteORA(cpu* CPU) {
+	value := cpu.Mapper.Read(cpu.Addr.ADH, cpu.Addr.ADL)
+	cpu.A.Value |= value
+	updateFlagsORA(cpu, cpu.A.Value)
+	cpu.PC.Increment(1)
+}
+
+func ORAImmediate(cpu* CPU) uint16 {
+  ExecuteORA(cpu)
+	return 2
+}
+
+func ORAZeroPage(cpu* CPU) uint16 {
+  GetZeroPageAddr(cpu)
+  ExecuteORA(cpu)
+	return 2
+}
+
+func ORAZeroPageX(cpu* CPU) uint16 {
+	GetZeroPageXAddr(cpu)
+  ExecuteORA(cpu)
+	return 2
+}
+
+func ORAAbsolute(cpu* CPU) uint16 {
+	GetAbsoluteAddr(cpu)
+  ExecuteORA(cpu)
+	return 4
+}
+
+func ORAAbsoluteX(cpu* CPU) uint16 {
+	adjusted := GetAbsoluteXAddr(cpu)
+  ExecuteORA(cpu)
+	return 4 + adjusted
+}
+
+func ORAAbsoluteY(cpu* CPU) uint16 {
+	adjusted := GetAbsoluteYAddr(cpu)
+  ExecuteORA(cpu)
+	return 4 + adjusted
+}
+
+func ORAIndirectX(cpu* CPU) uint16 {
+	GetIndirectXAddr(cpu)
+  ExecuteORA(cpu)
+	return 6
+}
+
+func ORAIndirectY(cpu* CPU) uint16 {
+	adjusted := GetIndirectYAddr(cpu)
+  ExecuteORA(cpu)
 	return 5 + adjusted
 }
 
