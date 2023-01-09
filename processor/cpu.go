@@ -37,6 +37,12 @@ func init() {
 	func_table[0x16] = ASLZeroPageX
 	func_table[0x0E] = ASLAbsolute
 	func_table[0x1E] = ASLAbsoluteX
+	//LSR
+	func_table[0x4A] = LSRA
+	func_table[0x46] = LSRZeroPage
+	func_table[0x56] = LSRZeroPageX
+	func_table[0x4E] = LSRAbsolute
+	func_table[0x5E] = LSRAbsoluteX
 	//AND
 	func_table[0x29] = ANDImmediate
 	func_table[0x25] = ANDZeroPage
