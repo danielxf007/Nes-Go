@@ -9,7 +9,10 @@ func (addr* AddressBuffer) Increment(value byte) uint16 {
 
 //Arithmetic
 
-//Shift Left
+
+//Bitwise
+
+//ASL
 func updateFlagsASL(cpu* CPU, bit byte, result byte) {
 	cpu.P.C = bit
 	cpu.P.N = GetNBit(result, 7)
@@ -37,7 +40,7 @@ func ExecuteASLMEM(cpu* CPU) {
 
 func ASLA(cpu* CPU) uint16 {
 	ExecuteASLA(cpu)
-	return 1
+	return 2
 }
 
 func ASLZeroPage(cpu* CPU) uint16 {
@@ -64,7 +67,60 @@ func ASLAbsoluteX(cpu* CPU) uint16 {
 	return 7
 }
 
-//Boolean
+//LSR
+func updateFlagsLSR(cpu* CPU, bit byte, result byte) {
+	cpu.P.C = bit
+	cpu.P.N = 0
+	if result == 0x00 {
+		cpu.P.Z = 1
+	}else {
+		cpu.P.Z = 0
+	}
+}
+
+func ExecuteLSRA(cpu* CPU) {
+	bit := GetNBit(cpu.A.Value, 0)
+	cpu.A.Value >>= 1
+	updateFlagsLSR(cpu, bit, cpu.A.Value)
+}
+
+func ExecuteLSRMEM(cpu* CPU) {
+	value := cpu.Mapper.Read(cpu.Addr.ADH, cpu.Addr.ADL)
+	bit := GetNBit(value, 0)
+	value >>= 1
+	updateFlagsASL(cpu, bit, value)
+	cpu.Mapper.Write(cpu.Addr.ADH, cpu.Addr.ADL, value)
+	cpu.PC.Increment(1)
+}
+
+func LSRA(cpu* CPU) uint16 {
+	ExecuteLSRA(cpu)
+	return 2
+}
+
+func LSRZeroPage(cpu* CPU) uint16 {
+  GetZeroPageAddr(cpu)
+  ExecuteLSRMEM(cpu)
+	return 5
+}
+
+func LSRZeroPageX(cpu* CPU) uint16 {
+	GetZeroPageXAddr(cpu)
+  ExecuteLSRMEM(cpu)
+	return 6
+}
+
+func LSRAbsolute(cpu* CPU) uint16 {
+	GetAbsoluteAddr(cpu)
+	ExecuteLSRMEM(cpu)
+	return 6
+}
+
+func LSRAbsoluteX(cpu* CPU) uint16 {
+	GetAbsoluteXAddr(cpu)
+  ExecuteLSRMEM(cpu)
+	return 7
+}
 
 //AND
 func updateFlagsAND(cpu* CPU, result byte) {
