@@ -76,4 +76,20 @@ func init() {
 	func_table[0xB4] = LDYZeroPageX
 	func_table[0xAC] = LDYAbsolute
 	func_table[0xBC] = LDYAbsoluteX
+	//STA
+	func_table[0x85] = STAZeroPage
+	func_table[0x95] = STAZeroPageX
+	func_table[0x8D] = STAAbsolute
+	func_table[0x9D] = STAAbsoluteX
+	func_table[0x99] = STAAbsoluteY
+	func_table[0x81] = STAIndirectX
+	func_table[0x91] = STAIndirectY
+	//STX
+	func_table[0x86] = STXZeroPage
+	func_table[0x96] = STXZeroPageY
+	func_table[0x8E] = STXAbsolute
+	//STY
+	func_table[0x84] = STYZeroPage
+	func_table[0x94] = STYZeroPageX
+	func_table[0x8C] = STYAbsolute
 }
