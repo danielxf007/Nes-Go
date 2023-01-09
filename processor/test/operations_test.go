@@ -239,7 +239,7 @@ func TestExecuteLoadRegister(t *testing.T) {
 	}
 }
 
-func TestStoreRegister(t *testing.T) {
+func TestExecuteStoreRegister(t *testing.T) {
   mapper := new(mappers.NoMapper)
 	cpu := new(processor.CPU)
 	cpu.Mapper = mapper
