@@ -13,6 +13,12 @@ func GetZeroPageXAddr(cpu* CPU) {
   cpu.Addr.ADH = 0x00
 }
 
+func GetZeroPageYAddr(cpu* CPU) {
+  cpu.Addr.ADL = cpu.Mapper.Read(cpu.PC.ADH, cpu.PC.ADL)
+  cpu.Addr.ADL += cpu.Y.Value
+  cpu.Addr.ADH = 0x00
+}
+
 func GetAbsoluteAddr(cpu* CPU) {
   cpu.Addr.ADL = cpu.Mapper.Read(cpu.PC.ADH, cpu.PC.ADL)
   cpu.PC.Increment(1)
