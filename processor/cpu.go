@@ -55,4 +55,25 @@ func init() {
 	func_table[0x19] = ORAAbsoluteY
 	func_table[0x01] = ORAIndirectX
 	func_table[0x11] = ORAIndirectY
+	//LDA
+	func_table[0xA9] = LDAImmediate
+	func_table[0xA5] = LDAZeroPage
+	func_table[0xB5] = LDAZeroPageX
+	func_table[0xAD] = LDAAbsolute
+	func_table[0xBD] = LDAAbsoluteX
+	func_table[0xB9] = LDAAbsoluteY
+	func_table[0xA1] = LDAIndirectX
+	func_table[0xB1] = LDAIndirectY
+	//LDX
+	func_table[0xA2] = LDXImmediate
+	func_table[0xA6] = LDXZeroPage
+	func_table[0xB6] = LDXZeroPageY
+	func_table[0xAE] = LDXAbsolute
+	func_table[0xBE] = LDXAbsoluteY
+	//LDY
+	func_table[0xA0] = LDYImmediate
+	func_table[0xA4] = LDYZeroPage
+	func_table[0xB4] = LDYZeroPageX
+	func_table[0xAC] = LDYAbsolute
+	func_table[0xBC] = LDYAbsoluteX
 }
