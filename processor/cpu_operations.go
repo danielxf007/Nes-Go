@@ -194,6 +194,132 @@ func ORAIndirectY(cpu* CPU) uint16 {
 	return 5 + adjusted
 }
 
+//Load Registers
+
+func updateFlagsLoadRegister(cpu* CPU, value byte) {
+	cpu.P.N = GetNBit(value, 7)
+	if value == 0x00 {
+		cpu.P.Z = 1
+	}else {
+		cpu.P.Z = 0
+	}
+}
+
+func ExecuteLoadRegister(cpu* CPU, register* Register) {
+  register.Value = cpu.Mapper.Read(cpu.Addr.ADH, cpu.Addr.ADL)
+  updateFlagsLoadRegister(cpu, register.Value)
+  cpu.PC.Increment(1)
+}
+
+//LDA
+func LDAImmediate(cpu* CPU) uint16 {
+  ExecuteLoadRegister(cpu, &cpu.A)
+	return 2
+}
+
+func LDAZeroPage(cpu* CPU) uint16 {
+  GetZeroPageAddr(cpu)
+  ExecuteLoadRegister(cpu, &cpu.A)
+	return 3
+}
+
+func LDAZeroPageX(cpu* CPU) uint16 {
+	GetZeroPageXAddr(cpu)
+  ExecuteLoadRegister(cpu, &cpu.A)
+	return 4
+}
+
+func LDAAbsolute(cpu* CPU) uint16 {
+	GetAbsoluteAddr(cpu)
+  ExecuteLoadRegister(cpu, &cpu.A)
+	return 4
+}
+
+func LDAAbsoluteX(cpu* CPU) uint16 {
+	adjusted := GetAbsoluteXAddr(cpu)
+  ExecuteLoadRegister(cpu, &cpu.A)
+	return 4 + adjusted
+}
+
+func LDAAbsoluteY(cpu* CPU) uint16 {
+	adjusted := GetAbsoluteYAddr(cpu)
+  ExecuteLoadRegister(cpu, &cpu.A)
+	return 4 + adjusted
+}
+
+func LDAIndirectX(cpu* CPU) uint16 {
+	GetIndirectXAddr(cpu)
+  ExecuteLoadRegister(cpu, &cpu.A)
+	return 6
+}
+
+func LDAIndirectY(cpu* CPU) uint16 {
+	adjusted := GetIndirectYAddr(cpu)
+  ExecuteLoadRegister(cpu, &cpu.A)
+	return 5 + adjusted
+}
+
+//LDX
+func LDXImmediate(cpu* CPU) uint16 {
+  ExecuteLoadRegister(cpu, &cpu.X)
+	return 2
+}
+
+func LDXZeroPage(cpu* CPU) uint16 {
+  GetZeroPageAddr(cpu)
+  ExecuteLoadRegister(cpu, &cpu.X)
+	return 3
+}
+
+func LDXZeroPageY(cpu* CPU) uint16 {
+	GetZeroPageYAddr(cpu)
+  ExecuteLoadRegister(cpu, &cpu.X)
+	return 4
+}
+
+func LDXAbsolute(cpu* CPU) uint16 {
+	GetAbsoluteAddr(cpu)
+  ExecuteLoadRegister(cpu, &cpu.X)
+	return 4
+}
+
+func LDXAbsoluteY(cpu* CPU) uint16 {
+	adjusted := GetAbsoluteYAddr(cpu)
+  ExecuteLoadRegister(cpu, &cpu.X)
+	return 4 + adjusted
+}
+
+//LDY
+func LDYImmediate(cpu* CPU) uint16 {
+  ExecuteLoadRegister(cpu, &cpu.Y)
+	return 2
+}
+
+func LDYZeroPage(cpu* CPU) uint16 {
+  GetZeroPageAddr(cpu)
+  ExecuteLoadRegister(cpu, &cpu.Y)
+	return 3
+}
+
+func LDYZeroPageX(cpu* CPU) uint16 {
+	GetZeroPageXAddr(cpu)
+  ExecuteLoadRegister(cpu, &cpu.Y)
+	return 4
+}
+
+func LDYAbsolute(cpu* CPU) uint16 {
+	GetAbsoluteAddr(cpu)
+  ExecuteLoadRegister(cpu, &cpu.Y)
+	return 4
+}
+
+func LDYAbsoluteX(cpu* CPU) uint16 {
+	adjusted := GetAbsoluteXAddr(cpu)
+  ExecuteLoadRegister(cpu, &cpu.Y)
+	return 4 + adjusted
+}
+
+
 func (cpu* CPU) Execute(n_cycles uint16) {
 	var current_cycles uint16 = 0
 	for current_cycles < n_cycles {
