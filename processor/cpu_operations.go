@@ -319,6 +319,93 @@ func LDYAbsoluteX(cpu* CPU) uint16 {
 	return 4 + adjusted
 }
 
+//Store Registers
+func ExecuteStoreRegister(cpu* CPU, register* Register) {
+  cpu.Mapper.Write(cpu.Addr.ADH, cpu.Addr.ADL, register.Value)
+  cpu.PC.Increment(1)
+}
+
+//STA
+func STAZeroPage(cpu* CPU) uint16 {
+  GetZeroPageAddr(cpu)
+  ExecuteStoreRegister(cpu, &cpu.A)
+	return 3
+}
+
+func STAZeroPageX(cpu* CPU) uint16 {
+	GetZeroPageXAddr(cpu)
+  ExecuteStoreRegister(cpu, &cpu.A)
+	return 4
+}
+
+func STAAbsolute(cpu* CPU) uint16 {
+	GetAbsoluteAddr(cpu)
+  ExecuteStoreRegister(cpu, &cpu.A)
+	return 4
+}
+
+func STAAbsoluteX(cpu* CPU) uint16 {
+	GetAbsoluteXAddr(cpu)
+  ExecuteStoreRegister(cpu, &cpu.A)
+	return 5
+}
+
+func STAAbsoluteY(cpu* CPU) uint16 {
+	GetAbsoluteYAddr(cpu)
+  ExecuteStoreRegister(cpu, &cpu.A)
+	return 5
+}
+
+func STAIndirectX(cpu* CPU) uint16 {
+	GetIndirectXAddr(cpu)
+  ExecuteStoreRegister(cpu, &cpu.A)
+	return 6
+}
+
+func STAIndirectY(cpu* CPU) uint16 {
+	GetIndirectYAddr(cpu)
+  ExecuteStoreRegister(cpu, &cpu.A)
+	return 6
+}
+
+//STX
+func STXZeroPage(cpu* CPU) uint16 {
+  GetZeroPageAddr(cpu)
+  ExecuteStoreRegister(cpu, &cpu.X)
+	return 3
+}
+
+func STXZeroPageY(cpu* CPU) uint16 {
+	GetZeroPageYAddr(cpu)
+  ExecuteStoreRegister(cpu, &cpu.X)
+	return 4
+}
+
+func STXAbsolute(cpu* CPU) uint16 {
+	GetAbsoluteAddr(cpu)
+  ExecuteStoreRegister(cpu, &cpu.X)
+	return 4
+}
+
+//STY
+func STYZeroPage(cpu* CPU) uint16 {
+  GetZeroPageAddr(cpu)
+  ExecuteStoreRegister(cpu, &cpu.Y)
+	return 3
+}
+
+func STYZeroPageX(cpu* CPU) uint16 {
+	GetZeroPageXAddr(cpu)
+  ExecuteStoreRegister(cpu, &cpu.Y)
+	return 4
+}
+
+func STYAbsolute(cpu* CPU) uint16 {
+	GetAbsoluteAddr(cpu)
+  ExecuteStoreRegister(cpu, &cpu.Y)
+	return 4
+}
+
 
 func (cpu* CPU) Execute(n_cycles uint16) {
 	var current_cycles uint16 = 0
