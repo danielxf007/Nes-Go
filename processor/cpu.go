@@ -99,4 +99,14 @@ func init() {
 	func_table[0x84] = STYZeroPage
 	func_table[0x94] = STYZeroPageX
 	func_table[0x8C] = STYAbsolute
+	//TAX
+	func_table[0xAA] = TAX
+	//TAY
+	func_table[0xA8] = TAY
+	//TXA
+	func_table[0x8A] = TXA
+	//TSX
+	func_table[0xBA] = TSX
+	//TXS
+	func_table[0x9A] = TXS
 }
