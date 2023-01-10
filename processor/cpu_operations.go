@@ -462,6 +462,59 @@ func STYAbsolute(cpu* CPU) uint16 {
 	return 4
 }
 
+//Transfer value among registers
+func updateFlagsTransferValueRegisters(cpu* CPU, value byte) {
+	cpu.P.N = GetNBit(value, 7)
+	if value == 0x00 {
+		cpu.P.Z = 1
+	}else {
+		cpu.P.Z = 0
+	}
+}
+
+
+func ExecuteTransferValueRegisters(cpu* CPU, src_reg* Register, target_reg* Register) {
+  target_reg.Value = src_reg.Value
+  updateFlagsTransferValueRegisters(cpu, src_reg.Value)
+}
+
+//TAX
+func TAX(cpu* CPU) {
+  ExecuteTransferValueRegisters(cpu, &cpu.A, &cpu.X)
+  return 2
+}
+
+//TAY
+func TAY(cpu* CPU) {
+  ExecuteTransferValueRegisters(cpu, &cpu.A, &cpu.Y)
+  return 2
+}
+
+//TXA
+func TXA(cpu* CPU) {
+  ExecuteTransferValueRegisters(cpu, &cpu.X, &cpu.A)
+  return 2
+}
+
+//TYA
+func TYA(cpu* CPU) {
+  ExecuteTransferValueRegisters(cpu, &cpu.Y, &cpu.A)
+  return 2
+}
+
+//Stack instructions
+
+//TXS
+func TXS(cpu* CPU) {
+  cpu.SP.Value = cpu.X.Value
+  return 2
+}
+
+//TSX
+func TSX(cpu* CPU) {
+  ExecuteTransferValueRegisters(cpu, &cpu.SP, &cpu.X)
+  return 2
+}
 
 func (cpu* CPU) Execute(n_cycles uint16) {
 	var current_cycles uint16 = 0
