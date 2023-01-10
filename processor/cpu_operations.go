@@ -21,6 +21,7 @@ func updateFlagsASL(cpu* CPU, bit byte, result byte) {
 	}else {
 		cpu.P.Z = 0
 	}
+	cpu.P.UpdateValue()
 }
 
 func ExecuteASLA(cpu* CPU) {
@@ -76,6 +77,7 @@ func updateFlagsLSR(cpu* CPU, bit byte, result byte) {
 	}else {
 		cpu.P.Z = 0
 	}
+	cpu.P.UpdateValue()
 }
 
 func ExecuteLSRA(cpu* CPU) {
@@ -130,6 +132,7 @@ func updateFlagsAND(cpu* CPU, result byte) {
 	}else {
 		cpu.P.Z = 0
 	}
+	cpu.P.UpdateValue()
 }
 
 func ExecuteAND(cpu* CPU) {
@@ -194,6 +197,7 @@ func updateFlagsORA(cpu* CPU, result byte) {
 	}else {
 		cpu.P.Z = 0
 	}
+	cpu.P.UpdateValue()
 }
 
 func ExecuteORA(cpu* CPU) {
@@ -259,6 +263,7 @@ func updateFlagsLoadRegister(cpu* CPU, value byte) {
 	}else {
 		cpu.P.Z = 0
 	}
+	cpu.P.UpdateValue()
 }
 
 func ExecuteLoadRegister(cpu* CPU, register* Register) {
@@ -470,6 +475,7 @@ func updateFlagsTransferValueRegisters(cpu* CPU, value byte) {
 	}else {
 		cpu.P.Z = 0
 	}
+	cpu.P.UpdateValue()
 }
 
 
@@ -517,7 +523,6 @@ func TSX(cpu* CPU) uint16 {
 }
 
 //Push operations
-
 func ExecutePush(cpu* CPU, value byte) {
   cpu.Mapper.Write(0x01, cpu.SP.Value, value)
   cpu.SP.Value--
@@ -534,6 +539,41 @@ func PHP(cpu* CPU) uint16 {
   ExecutePush(cpu, cpu.P.Value)
   return 3
 }
+
+//Pull operations
+func updateFlagsPull(cpu* CPU, value byte) {
+	cpu.P.N = GetNBit(value, 7)
+	if value == 0x00 {
+		cpu.P.Z = 1
+	}else {
+		cpu.P.Z = 0
+	}
+	cpu.P.UpdateValue()
+}
+
+func ExecutePullA(cpu* CPU) {
+  cpu.SP.Value++
+  cpu.A.Value = cpu.Mapper.Read(0x01, cpu.SP.Value)
+  updateFlagsPull(cpu, cpu.A.Value)
+}
+
+func ExecutePullP(cpu* CPU) {
+  cpu.SP.Value++
+  cpu.P.SetValue(cpu.Mapper.Read(0x01, cpu.SP.Value))
+}
+
+//PLA
+func PLA(cpu* CPU) uint16 {
+  ExecutePullA(cpu)
+  return 4
+}
+
+//PLP
+func PLP(cpu* CPU) uint16 {
+  ExecutePullP(cpu)
+  return 4
+}
+
 
 func (cpu* CPU) Execute(n_cycles uint16) {
 	var current_cycles uint16 = 0
