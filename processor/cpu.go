@@ -109,4 +109,13 @@ func init() {
 	func_table[0xBA] = TSX
 	//TXS
 	func_table[0x9A] = TXS
+	//PHA
+	func_table[0x48] = PHA
+	//PHP
+	func_table[0x08] = PHP
+	//PLA
+	func_table[0x68] = PLA
+	//PLP
+	func_table[0x28] = PLP
+
 }
