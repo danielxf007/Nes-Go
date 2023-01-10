@@ -479,25 +479,25 @@ func ExecuteTransferValueRegisters(cpu* CPU, src_reg* Register, target_reg* Regi
 }
 
 //TAX
-func TAX(cpu* CPU) {
+func TAX(cpu* CPU) uint16 {
   ExecuteTransferValueRegisters(cpu, &cpu.A, &cpu.X)
   return 2
 }
 
 //TAY
-func TAY(cpu* CPU) {
+func TAY(cpu* CPU) uint16 {
   ExecuteTransferValueRegisters(cpu, &cpu.A, &cpu.Y)
   return 2
 }
 
 //TXA
-func TXA(cpu* CPU) {
+func TXA(cpu* CPU) uint16 {
   ExecuteTransferValueRegisters(cpu, &cpu.X, &cpu.A)
   return 2
 }
 
 //TYA
-func TYA(cpu* CPU) {
+func TYA(cpu* CPU) uint16 {
   ExecuteTransferValueRegisters(cpu, &cpu.Y, &cpu.A)
   return 2
 }
@@ -505,15 +505,34 @@ func TYA(cpu* CPU) {
 //Stack instructions
 
 //TXS
-func TXS(cpu* CPU) {
+func TXS(cpu* CPU) uint16 {
   cpu.SP.Value = cpu.X.Value
   return 2
 }
 
 //TSX
-func TSX(cpu* CPU) {
+func TSX(cpu* CPU) uint16 {
   ExecuteTransferValueRegisters(cpu, &cpu.SP, &cpu.X)
   return 2
+}
+
+//Push operations
+
+func ExecutePush(cpu* CPU, value byte) {
+  cpu.Mapper.Write(0x01, cpu.SP.Value, value)
+  cpu.SP.Value--
+}
+
+//PHA
+func PHA(cpu* CPU) uint16 {
+  ExecutePush(cpu, cpu.A.Value)
+  return 3
+}
+
+//PHP
+func PHP(cpu* CPU) uint16 {
+  ExecutePush(cpu, cpu.P.Value)
+  return 3
 }
 
 func (cpu* CPU) Execute(n_cycles uint16) {
