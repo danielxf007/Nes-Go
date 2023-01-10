@@ -391,7 +391,7 @@ func TestExecuteTransferValueRegisters(t *testing.T) {
 	  {2, 1, 0x00, processor.FlagRegister{N: 0, Z: 1}},
 	  {2, 0, 0x80, processor.FlagRegister{N: 1, Z: 0}},
 	}
-	t.Log("Given the need to test the ExecuteStoreRegister operation.")
+	t.Log("Given the need to test the ExecuteTransferValueRegisters operation.")
 	{
 	  for _, element := range test_table {
 	    reg_types[element.from].Value = element.value
@@ -413,6 +413,43 @@ func TestExecuteTransferValueRegisters(t *testing.T) {
 	      t.Logf("Got the expected Z Flag %d", element.flag.Z)
 	    }else {
 	      t.Errorf("There was a problem with the flag Z, got %d expected %d", cpu.P.Z, element.flag.Z)
+	    }
+	  }
+	}
+}
+
+func TestExecutePush(t *testing.T) {
+  mapper := new(mappers.NoMapper)
+	cpu := new(processor.CPU)
+	cpu.Mapper = mapper
+	var value addrValue
+	var test_table = []struct {
+	  value byte
+	  sp_value_i byte
+	  sp_value_f byte
+	  result addrValue
+	}{
+	  {0x0F, 0x5F, 0x5E, addrValue{0x01, 0x5F, 0x0F}},
+	  {0x0F, 0x00, 0xFF, addrValue{0x01, 0x00, 0x0F}},
+	}
+	t.Log("Given the need to test the ExecutePush operation.")
+	{
+	  for _, element := range test_table {
+	    cpu.SP.Value = element.sp_value_i
+	    value = element.result
+	    t.Logf("Context SP:0x%02x Pushed_Value:0x%02x", cpu.SP.Value, element.value)
+	    processor.ExecutePush(cpu, element.value)
+	    if element.value == mapper.Read(value.ADH, value.ADL) {
+	      t.Logf("Got the expected result Mem[0x%02x%02x]:0x%02x", value.ADH, value.ADL, value.Value)
+	    }else {
+	      t.Errorf("There was a problem with the result, got Mem[0x%02x%02x]:0x%02x expected Mem[0x%02x%02x]:0x%02x",
+	      value.ADH, value.ADL, mapper.Read(value.ADH, value.ADL), value.ADH, value.ADL, value.Value)
+	    }
+	    if cpu.SP.Value == element.sp_value_f {
+	      t.Logf("Got the expected result SP:0x%02x", cpu.SP.Value)
+	    }else {
+	      t.Errorf("There was a problem with the result, got SP:0x%02x expected SP:0x%02x",
+	      cpu.SP.Value, element.sp_value_f)
 	    }
 	  }
 	}
