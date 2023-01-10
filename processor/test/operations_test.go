@@ -368,3 +368,52 @@ func TestExecuteStoreRegister(t *testing.T) {
 	  }
 	}
 }
+
+func TestExecuteTransferValueRegisters(t *testing.T) {
+  mapper := new(mappers.NoMapper)
+	cpu := new(processor.CPU)
+	cpu.Mapper = mapper
+	reg_types := [3]*processor.Register{&cpu.A, &cpu.X, &cpu.Y}
+	reg_names := [3]string{"A", "X", "Y"}
+	var test_table = []struct {
+	  from byte
+	  to byte
+	  value byte
+	  flag processor.FlagRegister
+	}{
+	  {0, 1, 0x0F, processor.FlagRegister{N: 0, Z: 0}},
+	  {0, 2, 0x00, processor.FlagRegister{N: 0, Z: 1}},
+	  {0, 1, 0x80, processor.FlagRegister{N: 1, Z: 0}},
+	  {1, 0, 0x0F, processor.FlagRegister{N: 0, Z: 0}},
+	  {1, 2, 0x00, processor.FlagRegister{N: 0, Z: 1}},
+	  {1, 0, 0x80, processor.FlagRegister{N: 1, Z: 0}},
+	  {2, 0, 0x0F, processor.FlagRegister{N: 0, Z: 0}},
+	  {2, 1, 0x00, processor.FlagRegister{N: 0, Z: 1}},
+	  {2, 0, 0x80, processor.FlagRegister{N: 1, Z: 0}},
+	}
+	t.Log("Given the need to test the ExecuteStoreRegister operation.")
+	{
+	  for _, element := range test_table {
+	    reg_types[element.from].Value = element.value
+	    t.Logf("Context %s:0x%02x %s:0x%02x", reg_names[element.from], reg_types[element.from].Value,
+	    reg_names[element.to], reg_types[element.to].Value)
+	    processor.ExecuteTransferValueRegisters(cpu, reg_types[element.from], reg_types[element.to])
+	    if reg_types[element.from].Value == reg_types[element.to].Value {
+	      t.Logf("Got the expected result %s:0x%02x", reg_names[element.to], reg_types[element.to].Value)
+	    }else {
+	      t.Errorf("There was a problem with the result, got %s:0x%02x expected %s:0x%02x",
+	      reg_names[element.to], reg_types[element.to].Value, reg_names[element.to], reg_types[element.from].Value)
+	    }
+	    if cpu.P.N == element.flag.N {
+	      t.Logf("Got the expected N Flag %d", element.flag.N)
+	    }else {
+	      t.Errorf("There was a problem with the flag N, got %d expected %d", cpu.P.N, element.flag.N)
+	    }
+	    if cpu.P.Z == element.flag.Z {
+	      t.Logf("Got the expected Z Flag %d", element.flag.Z)
+	    }else {
+	      t.Errorf("There was a problem with the flag Z, got %d expected %d", cpu.P.Z, element.flag.Z)
+	    }
+	  }
+	}
+}
