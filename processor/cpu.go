@@ -13,6 +13,7 @@ type CPU struct {
 	X Register
 	Y Register
 	P FlagRegister
+	SP Register
 	PC ProgramCounter
 	Addr AddressBuffer
 	Mapper mappers.MapperInterface	
