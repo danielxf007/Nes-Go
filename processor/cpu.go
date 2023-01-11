@@ -62,6 +62,15 @@ func init() {
 	func_table[0x19] = ORAAbsoluteY
 	func_table[0x01] = ORAIndirectX
 	func_table[0x11] = ORAIndirectY
+	//EOR
+	func_table[0x49] = EORImmediate
+	func_table[0x45] = EORZeroPage
+	func_table[0x55] = EORZeroPageX
+	func_table[0x4D] = EORAbsolute
+	func_table[0x5D] = EORAbsoluteX
+	func_table[0x59] = EORAbsoluteY
+	func_table[0x41] = EORIndirectX
+	func_table[0x51] = EORIndirectY
 	//LDA
 	func_table[0xA9] = LDAImmediate
 	func_table[0xA5] = LDAZeroPage
