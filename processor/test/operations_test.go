@@ -454,3 +454,149 @@ func TestExecutePush(t *testing.T) {
 	  }
 	}
 }
+
+func TestExecutePullA(t *testing.T) {
+  mapper := new(mappers.NoMapper)
+	cpu := new(processor.CPU)
+	cpu.Mapper = mapper
+	var value addrValue
+	var test_table = []struct {
+	  value addrValue
+	  sp_value_i byte
+	  sp_value_f byte
+	  flag processor.FlagRegister
+	}{
+	  {addrValue{0x01, 0x60, 0x0F}, 0x5F, 0x60, processor.FlagRegister{N: 0, Z: 0}},
+	  {addrValue{0x01, 0x01, 0x00}, 0x00, 0x01, processor.FlagRegister{N: 0, Z: 1}},
+	  {addrValue{0x01, 0x00, 0x80}, 0xFF, 0x00, processor.FlagRegister{N: 1, Z: 0}},
+	}
+	t.Log("Given the need to test the ExecutePullA operation.")
+	{
+	  for _, element := range test_table {
+	    value = element.value
+	    cpu.SP.Value = element.sp_value_i
+	    mapper.Write(value.ADH, value.ADL, value.Value)
+	    t.Logf("Context SP:0x%02x Mem[0x%02x%02x]:0x%02x", cpu.SP.Value, value.ADH, value.ADL, value.Value)
+	    processor.ExecutePullA(cpu)
+	    if cpu.A.Value == value.Value {
+	      t.Logf("Got the expected result %s:0x%02x", "A", value.Value)
+	    }else {
+	      t.Errorf("There was a problem with the result, got %s:0x%02x expected %s:0x%02x",
+	      "A", cpu.A.Value, "A", value.Value)
+	    }
+	    if cpu.SP.Value == element.sp_value_f {
+	      t.Logf("Got the expected result SP:0x%02x", cpu.SP.Value)
+	    }else {
+	      t.Errorf("There was a problem with the result, got SP:0x%02x expected SP:0x%02x",
+	      cpu.SP.Value, element.sp_value_f)
+	    }
+	    if cpu.P.N == element.flag.N {
+	      t.Logf("Got the expected N Flag %d", element.flag.N)
+	    }else {
+	      t.Errorf("There was a problem with the flag N, got %d expected %d", cpu.P.N, element.flag.N)
+	    }
+	    if cpu.P.Z == element.flag.Z {
+	      t.Logf("Got the expected Z Flag %d", element.flag.Z)
+	    }else {
+	      t.Errorf("There was a problem with the flag Z, got %d expected %d", cpu.P.Z, element.flag.Z)
+	    }
+	  }
+	}
+}
+
+func TestExecutePullP(t *testing.T) {
+  mapper := new(mappers.NoMapper)
+	cpu := new(processor.CPU)
+	cpu.Mapper = mapper
+	var value addrValue
+	var test_table = []struct {
+	  value addrValue
+	  sp_value_i byte
+	  sp_value_f byte
+	  flag processor.FlagRegister
+	}{
+	  {addrValue{0x01, 0x60, 0xFF}, 0x5F, 0x60, processor.FlagRegister{N: 1, V:1, B:1, D:1, I:1, Z: 1, C: 1}},
+	}
+	t.Log("Given the need to test the ExecutePullA operation.")
+	{
+	  for _, element := range test_table {
+	    value = element.value
+	    cpu.SP.Value = element.sp_value_i
+	    mapper.Write(value.ADH, value.ADL, value.Value)
+	    t.Logf("Context SP:0x%02x Mem[0x%02x%02x]:0x%02x", cpu.SP.Value, value.ADH, value.ADL, value.Value)
+	    processor.ExecutePullP(cpu)
+	    if cpu.P.Value == value.Value {
+	      t.Logf("Got the expected result %s:0x%02x", "P", value.Value)
+	    }else {
+	      t.Errorf("There was a problem with the result, got %s:0x%02x expected %s:0x%02x",
+	      "P", cpu.P.Value, "P", value.Value)
+	    }
+	    if cpu.SP.Value == element.sp_value_f {
+	      t.Logf("Got the expected result SP:0x%02x", cpu.SP.Value)
+	    }else {
+	      t.Errorf("There was a problem with the result, got SP:0x%02x expected SP:0x%02x",
+	      cpu.SP.Value, element.sp_value_f)
+	    }
+	    if cpu.P.C == element.flag.C {
+	      t.Logf("Got the expected C Flag %d", element.flag.C)
+	    }else {
+	      t.Errorf("There was a problem with the flag C, got %d expected %d", cpu.P.C, element.flag.C)
+	    }
+	    if cpu.P.Z == element.flag.Z {
+	      t.Logf("Got the expected Z Flag %d", element.flag.Z)
+	    }else {
+	      t.Errorf("There was a problem with the flag Z, got %d expected %d", cpu.P.Z, element.flag.Z)
+	    }
+	    if cpu.P.N == element.flag.N {
+	      t.Logf("Got the expected N Flag %d", element.flag.N)
+	    }else {
+	      t.Errorf("There was a problem with the flag N, got %d expected %d", cpu.P.N, element.flag.N)
+	    }
+	  }
+	}
+}
+
+func TestExecuteEOR(t *testing.T) {
+  mapper := new(mappers.NoMapper)
+	cpu := new(processor.CPU)
+	cpu.Mapper = mapper
+	var value addrValue
+	var test_table = []struct {
+		A processor.Register
+		value addrValue
+		result byte
+		flag processor.FlagRegister
+	}{
+	  {processor.Register{0x10}, addrValue{0x01, 0x00, 0x0F}, 0x1F, processor.FlagRegister{N: 0, Z: 0}},
+	  {processor.Register{0x8F}, addrValue{0x02, 0xFF, 0x0F}, 0x80, processor.FlagRegister{N: 1, Z: 0}},
+	  {processor.Register{0xFF}, addrValue{0x03, 0xAA, 0xFF}, 0x00, processor.FlagRegister{N: 0, Z: 1}},
+	}
+	t.Log("Given the need to test the ExecuteEOR operation.")
+	{
+	  for _, element := range test_table {
+	    cpu.A = element.A
+	    value = element.value
+	    cpu.Addr.ADH = value.ADH
+	    cpu.Addr.ADL = value.ADL
+	    mapper.Write(value.ADH, value.ADL, value.Value)
+	    t.Logf("Context A:%08b Mem[0x%02x%02x]:%08b", cpu.A.Value, value.ADH, value.ADL, value.Value)
+	    processor.ExecuteEOR(cpu)
+	    if cpu.A.Value == element.result {
+	      t.Logf("Got the expected result %08b", element.result)
+	    }else {
+	      t.Errorf("There was a problem with the result, got %08b expected %08b", cpu.A.Value, element.result)
+	    }
+	    if cpu.P.N == element.flag.N {
+	      t.Logf("Got the expected N Flag %d", element.flag.N)
+	    }else {
+	      t.Errorf("There was a problem with the flag N, got %d expected %d", cpu.P.N, element.flag.N)
+	    }
+	    if cpu.P.Z == element.flag.Z {
+	      t.Logf("Got the expected Z Flag %d", element.flag.Z)
+	    }else {
+	      t.Errorf("There was a problem with the flag Z, got %d expected %d", cpu.P.Z, element.flag.Z)
+	    }
+	  }
+	}
+}
+
