@@ -150,13 +150,13 @@ func ANDImmediate(cpu* CPU) uint16 {
 func ANDZeroPage(cpu* CPU) uint16 {
   GetZeroPageAddr(cpu)
   ExecuteAND(cpu)
-	return 2
+	return 3
 }
 
 func ANDZeroPageX(cpu* CPU) uint16 {
 	GetZeroPageXAddr(cpu)
   ExecuteAND(cpu)
-	return 2
+	return 4
 }
 
 func ANDAbsolute(cpu* CPU) uint16 {
@@ -215,13 +215,13 @@ func ORAImmediate(cpu* CPU) uint16 {
 func ORAZeroPage(cpu* CPU) uint16 {
   GetZeroPageAddr(cpu)
   ExecuteORA(cpu)
-	return 2
+	return 3
 }
 
 func ORAZeroPageX(cpu* CPU) uint16 {
 	GetZeroPageXAddr(cpu)
   ExecuteORA(cpu)
-	return 2
+	return 4
 }
 
 func ORAAbsolute(cpu* CPU) uint16 {
@@ -251,6 +251,71 @@ func ORAIndirectX(cpu* CPU) uint16 {
 func ORAIndirectY(cpu* CPU) uint16 {
 	adjusted := GetIndirectYAddr(cpu)
   ExecuteORA(cpu)
+	return 5 + adjusted
+}
+
+//EOR
+func updateFlagsEOR(cpu* CPU, result byte) {
+	cpu.P.N = GetNBit(result, 7)
+	if result == 0x00 {
+		cpu.P.Z = 1
+	}else {
+		cpu.P.Z = 0
+	}
+	cpu.P.UpdateValue()
+}
+
+func ExecuteEOR(cpu* CPU) {
+	value := cpu.Mapper.Read(cpu.Addr.ADH, cpu.Addr.ADL)
+	cpu.A.Value ^= value
+	updateFlagsORA(cpu, cpu.A.Value)
+	cpu.PC.Increment(1)
+}
+
+func EORImmediate(cpu* CPU) uint16 {
+  ExecuteEOR(cpu)
+	return 2
+}
+
+func EORZeroPage(cpu* CPU) uint16 {
+  GetZeroPageAddr(cpu)
+  ExecuteEOR(cpu)
+	return 3
+}
+
+func EORZeroPageX(cpu* CPU) uint16 {
+	GetZeroPageXAddr(cpu)
+  ExecuteEOR(cpu)
+	return 4
+}
+
+func EORAbsolute(cpu* CPU) uint16 {
+	GetAbsoluteAddr(cpu)
+  ExecuteEOR(cpu)
+	return 4
+}
+
+func EORAbsoluteX(cpu* CPU) uint16 {
+	adjusted := GetAbsoluteXAddr(cpu)
+  ExecuteEOR(cpu)
+	return 4 + adjusted
+}
+
+func EORAbsoluteY(cpu* CPU) uint16 {
+	adjusted := GetAbsoluteYAddr(cpu)
+  ExecuteEOR(cpu)
+	return 4 + adjusted
+}
+
+func EORIndirectX(cpu* CPU) uint16 {
+	GetIndirectXAddr(cpu)
+  ExecuteEOR(cpu)
+	return 6
+}
+
+func EORIndirectY(cpu* CPU) uint16 {
+	adjusted := GetIndirectYAddr(cpu)
+  ExecuteEOR(cpu)
 	return 5 + adjusted
 }
 
