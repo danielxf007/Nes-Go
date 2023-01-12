@@ -9,7 +9,7 @@ func (addr* AddressBuffer) Increment(value byte) uint16 {
 
 //Arithmetic
 
-//INC
+//INCREMENT
 func updateFlagsINC(cpu* CPU, result byte) {
 	cpu.P.N = GetNBit(result, 7)
 	if result == 0x00 {
@@ -67,6 +67,67 @@ func INX(cpu* CPU) uint16 {
 //INY
 func INY(cpu* CPU) uint16 {
   ExecuteINCReg(cpu, &cpu.Y)
+	return 2
+}
+
+//DECREMENT
+func updateFlagsDEC(cpu* CPU, result byte) {
+	cpu.P.N = GetNBit(result, 7)
+	if result == 0x00 {
+		cpu.P.Z = 1
+	}else {
+		cpu.P.Z = 0
+	}
+	cpu.P.UpdateValue()
+}
+
+func ExecuteDECReg(cpu* CPU, reg* Register) {
+	reg.Value--
+	updateFlagsINC(cpu, reg.Value)
+}
+
+func ExecuteDECMEM(cpu* CPU) {
+  value := cpu.Mapper.Read(cpu.Addr.ADH, cpu.Addr.ADL)
+	value--
+	cpu.Mapper.Write(cpu.Addr.ADH, cpu.Addr.ADL, value)
+	updateFlagsINC(cpu, value)
+	cpu.PC.Increment(1)
+}
+
+//DEC
+func DECZeroPage(cpu* CPU) uint16 {
+  GetZeroPageAddr(cpu)
+  ExecuteDECMEM(cpu)
+	return 5
+}
+
+func DECZeroPageX(cpu* CPU) uint16 {
+	GetZeroPageXAddr(cpu)
+  ExecuteDECMEM(cpu)
+	return 6
+}
+
+func DECAbsolute(cpu* CPU) uint16 {
+	GetAbsoluteAddr(cpu)
+	ExecuteDECMEM(cpu)
+	return 6
+}
+
+func DECAbsoluteX(cpu* CPU) uint16 {
+	GetAbsoluteXAddr(cpu)
+  ExecuteDECMEM(cpu)
+	return 7
+}
+
+//INX
+func DEX(cpu* CPU) uint16 {
+  ExecuteDECReg(cpu, &cpu.X)
+	return 2
+}
+
+//INY
+func DEY(cpu* CPU) uint16 {
+  ExecuteDECReg(cpu, &cpu.Y)
 	return 2
 }
 
