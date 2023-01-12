@@ -9,6 +9,66 @@ func (addr* AddressBuffer) Increment(value byte) uint16 {
 
 //Arithmetic
 
+//INC
+func updateFlagsINC(cpu* CPU, result byte) {
+	cpu.P.N = GetNBit(result, 7)
+	if result == 0x00 {
+		cpu.P.Z = 1
+	}else {
+		cpu.P.Z = 0
+	}
+	cpu.P.UpdateValue()
+}
+
+func ExecuteINCReg(cpu* CPU, reg* Register) {
+	reg.Value++
+	updateFlagsINC(cpu, reg.Value)
+}
+
+func ExecuteINCMEM(cpu* CPU) {
+  value := cpu.Mapper.Read(cpu.Addr.ADH, cpu.Addr.ADL)
+	value++
+	cpu.Mapper.Write(cpu.Addr.ADH, cpu.Addr.ADL, value)
+	updateFlagsINC(cpu, value)
+	cpu.PC.Increment(1)
+}
+
+//INC
+func INCZeroPage(cpu* CPU) uint16 {
+  GetZeroPageAddr(cpu)
+  ExecuteINCMEM(cpu)
+	return 5
+}
+
+func INCZeroPageX(cpu* CPU) uint16 {
+	GetZeroPageXAddr(cpu)
+  ExecuteINCMEM(cpu)
+	return 6
+}
+
+func INCAbsolute(cpu* CPU) uint16 {
+	GetAbsoluteAddr(cpu)
+	ExecuteINCMEM(cpu)
+	return 6
+}
+
+func INCAbsoluteX(cpu* CPU) uint16 {
+	GetAbsoluteXAddr(cpu)
+  ExecuteINCMEM(cpu)
+	return 7
+}
+
+//INX
+func INX(cpu* CPU) uint16 {
+  ExecuteINCReg(cpu, &cpu.X)
+	return 2
+}
+
+//INY
+func INY(cpu* CPU) uint16 {
+  ExecuteINCReg(cpu, &cpu.Y)
+	return 2
+}
 
 //Bitwise
 
