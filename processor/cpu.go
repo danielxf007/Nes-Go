@@ -41,6 +41,15 @@ func init() {
 	func_table[0xE8] = INX
 	//INY
 	func_table[0xC8] = INY
+	//DEC
+	func_table[0xC6] = DECZeroPage
+	func_table[0xD6] = DECZeroPageX
+	func_table[0xCE] = DECAbsolute
+	func_table[0xDE] = DECAbsoluteX
+	//DEX
+	func_table[0xCA] = DEX
+	//DEY
+	func_table[0x88] = DEY
 	//ASL
 	func_table[0x0A] = ASLA
 	func_table[0x06] = ASLZeroPage
