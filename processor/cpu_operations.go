@@ -11,13 +11,12 @@ func (addr* AddressBuffer) Increment(value byte) uint16 {
 
 //INCREMENT
 func updateFlagsINC(cpu* CPU, result byte) {
-	cpu.P.N = GetNBit(result, 7)
 	if result == 0x00 {
-		cpu.P.Z = 1
+		cpu.P.SetFlagZ(1)
 	}else {
-		cpu.P.Z = 0
+		cpu.P.SetFlagZ(0)
 	}
-	cpu.P.UpdateValue()
+	cpu.P.SetFlagN(GetNBit(result, 7))
 }
 
 func ExecuteINCReg(cpu* CPU, reg* Register) {
@@ -72,13 +71,12 @@ func INY(cpu* CPU) uint16 {
 
 //DECREMENT
 func updateFlagsDEC(cpu* CPU, result byte) {
-	cpu.P.N = GetNBit(result, 7)
 	if result == 0x00 {
-		cpu.P.Z = 1
+		cpu.P.SetFlagZ(1)
 	}else {
-		cpu.P.Z = 0
+		cpu.P.SetFlagZ(0)
 	}
-	cpu.P.UpdateValue()
+	cpu.P.SetFlagN(GetNBit(result, 7))
 }
 
 func ExecuteDECReg(cpu* CPU, reg* Register) {
@@ -135,14 +133,13 @@ func DEY(cpu* CPU) uint16 {
 
 //ASL
 func updateFlagsASL(cpu* CPU, bit byte, result byte) {
-	cpu.P.C = bit
-	cpu.P.N = GetNBit(result, 7)
+	cpu.P.SetFlagC(bit)
 	if result == 0x00 {
-		cpu.P.Z = 1
+		cpu.P.SetFlagZ(1)
 	}else {
-		cpu.P.Z = 0
+		cpu.P.SetFlagZ(0)
 	}
-	cpu.P.UpdateValue()
+	cpu.P.SetFlagN(GetNBit(result, 7))
 }
 
 func ExecuteASLA(cpu* CPU) {
@@ -191,14 +188,13 @@ func ASLAbsoluteX(cpu* CPU) uint16 {
 
 //LSR
 func updateFlagsLSR(cpu* CPU, bit byte, result byte) {
-	cpu.P.C = bit
-	cpu.P.N = 0
+	cpu.P.SetFlagC(bit)
 	if result == 0x00 {
-		cpu.P.Z = 1
+		cpu.P.SetFlagZ(1)
 	}else {
-		cpu.P.Z = 0
+		cpu.P.SetFlagZ(0)
 	}
-	cpu.P.UpdateValue()
+	cpu.P.SetFlagN(GetNBit(result, 7))
 }
 
 func ExecuteLSRA(cpu* CPU) {
@@ -247,13 +243,12 @@ func LSRAbsoluteX(cpu* CPU) uint16 {
 
 //AND
 func updateFlagsAND(cpu* CPU, result byte) {
-	cpu.P.N = GetNBit(result, 7)
 	if result == 0x00 {
-		cpu.P.Z = 1
+		cpu.P.SetFlagZ(1)
 	}else {
-		cpu.P.Z = 0
+		cpu.P.SetFlagZ(0)
 	}
-	cpu.P.UpdateValue()
+	cpu.P.SetFlagN(GetNBit(result, 7))
 }
 
 func ExecuteAND(cpu* CPU) {
@@ -312,13 +307,12 @@ func ANDIndirectY(cpu* CPU) uint16 {
 
 //ORA
 func updateFlagsORA(cpu* CPU, result byte) {
-	cpu.P.N = GetNBit(result, 7)
 	if result == 0x00 {
-		cpu.P.Z = 1
+		cpu.P.SetFlagZ(1)
 	}else {
-		cpu.P.Z = 0
+		cpu.P.SetFlagZ(0)
 	}
-	cpu.P.UpdateValue()
+	cpu.P.SetFlagN(GetNBit(result, 7))
 }
 
 func ExecuteORA(cpu* CPU) {
@@ -377,13 +371,12 @@ func ORAIndirectY(cpu* CPU) uint16 {
 
 //EOR
 func updateFlagsEOR(cpu* CPU, result byte) {
-	cpu.P.N = GetNBit(result, 7)
 	if result == 0x00 {
-		cpu.P.Z = 1
+		cpu.P.SetFlagZ(1)
 	}else {
-		cpu.P.Z = 0
+		cpu.P.SetFlagZ(0)
 	}
-	cpu.P.UpdateValue()
+	cpu.P.SetFlagN(GetNBit(result, 7))
 }
 
 func ExecuteEOR(cpu* CPU) {
@@ -443,13 +436,12 @@ func EORIndirectY(cpu* CPU) uint16 {
 //Load Registers
 
 func updateFlagsLoadRegister(cpu* CPU, value byte) {
-	cpu.P.N = GetNBit(value, 7)
 	if value == 0x00 {
-		cpu.P.Z = 1
+		cpu.P.SetFlagZ(1)
 	}else {
-		cpu.P.Z = 0
+		cpu.P.SetFlagZ(0)
 	}
-	cpu.P.UpdateValue()
+	cpu.P.SetFlagN(GetNBit(value, 7))
 }
 
 func ExecuteLoadRegister(cpu* CPU, register* Register) {
@@ -655,13 +647,12 @@ func STYAbsolute(cpu* CPU) uint16 {
 
 //Transfer value among registers
 func updateFlagsTransferValueRegisters(cpu* CPU, value byte) {
-	cpu.P.N = GetNBit(value, 7)
 	if value == 0x00 {
-		cpu.P.Z = 1
+		cpu.P.SetFlagZ(1)
 	}else {
-		cpu.P.Z = 0
+		cpu.P.SetFlagZ(0)
 	}
-	cpu.P.UpdateValue()
+	cpu.P.SetFlagN(GetNBit(value, 7))
 }
 
 
@@ -728,13 +719,12 @@ func PHP(cpu* CPU) uint16 {
 
 //Pull operations
 func updateFlagsPull(cpu* CPU, value byte) {
-	cpu.P.N = GetNBit(value, 7)
 	if value == 0x00 {
-		cpu.P.Z = 1
+		cpu.P.SetFlagZ(1)
 	}else {
-		cpu.P.Z = 0
+		cpu.P.SetFlagZ(0)
 	}
-	cpu.P.UpdateValue()
+	cpu.P.SetFlagN(GetNBit(value, 7))
 }
 
 func ExecutePullA(cpu* CPU) {
@@ -745,7 +735,7 @@ func ExecutePullA(cpu* CPU) {
 
 func ExecutePullP(cpu* CPU) {
   cpu.SP.Value++
-  cpu.P.SetValue(cpu.Mapper.Read(0x01, cpu.SP.Value))
+  cpu.P.Value = cpu.Mapper.Read(0x01, cpu.SP.Value)
 }
 
 //PLA
