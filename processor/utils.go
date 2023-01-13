@@ -57,5 +57,9 @@ func GetIndirectYAddr(cpu* CPU) uint16 {
 
 //Bit
 func GetNBit(value byte, n byte) byte {
-  return (value >> n) & 0x01 
+  return ((value >> n) & 0x01) 
+}
+
+func SetNBit(value byte, n byte, bit byte) byte {
+  return ((value & ^(0x01 << n)) | (bit << n)) 
 }
