@@ -10,13 +10,6 @@ type ProgramCounter struct {
 }
 
 type FlagRegister struct {
-	C byte
-	Z byte
-	I byte
-	D byte
-	B byte
-	V byte
-	N byte
 	Value byte
 }
 
@@ -41,22 +34,79 @@ func (pc* ProgramCounter) Decrement(value byte) uint16 {
 }
 
 type FlagRegisterOperations interface {
-  UpdateValue()
-  SetValue(value byte)
+	SetFlagC(bit byte)
+	GetFlagC() byte
+	SetFlagZ(bit byte)
+	GetFlagZ() byte
+	SetFlagI(bit byte)
+	GetFlagI() byte
+	SetFlagD(bit byte)
+	GetFlagD() byte
+	SetFlagB(bit byte)
+	GetFlagB() byte
+	SetFlagV(bit byte)
+	GetFlagV() byte
+	SetFlagN(bit byte)
+	GetFlagN() byte
 	Reset()
 }
 
-func (p* FlagRegister) UpdateValue() {
-  p.Value = (p.N << 7)|(p.V << 6)|(p.B << 4)|(p.D << 3)|(p.I << 2)|(p.Z << 1)|(p.C)
+func (p* FlagRegister) SetFlagC(bit byte) {
+	p.Value = SetNBit(p.Value, 0, bit)
 }
 
-func (p* FlagRegister) SetValue(value byte) {
-  p.Value = value
-  p.C, p.Z, p.I, p.D = GetNBit(value, 0), GetNBit(value, 1), GetNBit(value, 2), GetNBit(value, 3)
-  p.B, p.V, p.N = GetNBit(value, 4), GetNBit(value, 6), GetNBit(value, 7)
+func (p* FlagRegister) GetFlagC() byte {
+	return GetNBit(p.Value, 0)
+}
+
+func (p* FlagRegister) SetFlagZ(bit byte) {
+	p.Value = SetNBit(p.Value, 1, bit)
+}
+
+func (p* FlagRegister) GetFlagZ() byte {
+	return GetNBit(p.Value, 1)
+}
+
+func (p* FlagRegister) SetFlagI(bit byte) {
+	p.Value = SetNBit(p.Value, 2, bit)
+}
+
+func (p* FlagRegister) GetFlagI() byte {
+	return GetNBit(p.Value, 2)
+}
+
+func (p* FlagRegister) SetFlagD(bit byte) {
+	p.Value = SetNBit(p.Value, 3, bit)
+}
+
+func (p* FlagRegister) GetFlagD() byte {
+	return GetNBit(p.Value, 3)
+}
+
+func (p* FlagRegister) SetFlagB(bit byte) {
+	p.Value = SetNBit(p.Value, 4, bit)
+}
+
+func (p* FlagRegister) GetFlagB() byte {
+	return GetNBit(p.Value, 4)
+}
+
+func (p* FlagRegister) SetFlagV(bit byte) {
+	p.Value = SetNBit(p.Value, 6, bit)
+}
+
+func (p* FlagRegister) GetFlagV() byte {
+	return GetNBit(p.Value, 6)
+}
+
+func (p* FlagRegister) SetFlagN(bit byte) {
+	p.Value = SetNBit(p.Value, 7, bit)
+}
+
+func (p* FlagRegister) GetFlagN() byte {
+	return GetNBit(p.Value, 7)
 }
 
 func (p* FlagRegister) Reset() {
-	p.C, p.Z, p.I, p.D, p.B, p.V, p.N = 0, 0, 0, 0, 0, 0, 0
-	p.UpdateValue()
+	p.Value = 0x00
 }
