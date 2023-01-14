@@ -750,6 +750,49 @@ func PLP(cpu* CPU) uint16 {
   return 4
 }
 
+//Flag Operations
+
+//CLC
+func CLC(cpu* CPU) uint16 {
+  cpu.P.SetFlagC(0)
+  return 2
+}
+
+//SEC
+func SEC(cpu* CPU) uint16 {
+  cpu.P.SetFlagC(1)
+  return 2
+}
+
+//CLD
+func CLD(cpu* CPU) uint16 {
+  cpu.P.SetFlagD(0)
+  return 2
+}
+
+//SED
+func SED(cpu* CPU) uint16 {
+  cpu.P.SetFlagD(1)
+  return 2
+}
+
+//CLI
+func CLI(cpu* CPU) uint16 {
+  cpu.P.SetFlagI(0)
+  return 2
+}
+
+//SEI
+func SEI(cpu* CPU) uint16 {
+  cpu.P.SetFlagI(1)
+  return 2
+}
+
+//CLV
+func CLV(cpu* CPU) uint16 {
+  cpu.P.SetFlagV(0)
+  return 2
+}
 
 func (cpu* CPU) Execute(n_cycles uint16) {
 	var current_cycles uint16 = 0
