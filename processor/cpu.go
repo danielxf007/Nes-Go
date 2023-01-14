@@ -32,6 +32,7 @@ var func_table [0xFF]func(cpu* CPU) uint16
 
 func init() {
 	func_table = [0xFF]func(cpu* CPU) uint16{}
+	//Arithmetic
 	//INC
 	func_table[0xE6] = INCZeroPage
 	func_table[0xF6] = INCZeroPageX
@@ -50,6 +51,7 @@ func init() {
 	func_table[0xCA] = DEX
 	//DEY
 	func_table[0x88] = DEY
+	//Bitwise
 	//ASL
 	func_table[0x0A] = ASLA
 	func_table[0x06] = ASLZeroPage
@@ -89,6 +91,7 @@ func init() {
 	func_table[0x59] = EORAbsoluteY
 	func_table[0x41] = EORIndirectX
 	func_table[0x51] = EORIndirectY
+	//Load
 	//LDA
 	func_table[0xA9] = LDAImmediate
 	func_table[0xA5] = LDAZeroPage
@@ -110,6 +113,7 @@ func init() {
 	func_table[0xB4] = LDYZeroPageX
 	func_table[0xAC] = LDYAbsolute
 	func_table[0xBC] = LDYAbsoluteX
+	//Store
 	//STA
 	func_table[0x85] = STAZeroPage
 	func_table[0x95] = STAZeroPageX
@@ -126,12 +130,14 @@ func init() {
 	func_table[0x84] = STYZeroPage
 	func_table[0x94] = STYZeroPageX
 	func_table[0x8C] = STYAbsolute
+	//Register Transfer
 	//TAX
 	func_table[0xAA] = TAX
 	//TAY
 	func_table[0xA8] = TAY
 	//TXA
 	func_table[0x8A] = TXA
+	//Stack
 	//TSX
 	func_table[0xBA] = TSX
 	//TXS
@@ -144,5 +150,20 @@ func init() {
 	func_table[0x68] = PLA
 	//PLP
 	func_table[0x28] = PLP
+	//Flag Operations
+	//CLC
+	func_table[0x18] = CLC
+	//SEC
+	func_table[0x38] = SEC
+	//CLI
+	func_table[0x58] = CLI
+	//SEI
+	func_table[0x78] = SEI
+	//CLD
+	func_table[0xD8] = CLD
+	//SED
+	func_table[0xF8] = SED
+	//CLV
+	func_table[0xB8] = CLV
 
 }
