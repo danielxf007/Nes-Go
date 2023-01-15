@@ -33,6 +33,15 @@ var func_table [0xFF]func(cpu* CPU) uint16
 func init() {
 	func_table = [0xFF]func(cpu* CPU) uint16{}
 	//Arithmetic
+	//ADC
+	func_table[0x69] = ADCImmediate
+	func_table[0x65] = ADCZeroPage
+	func_table[0x75] = ADCZeroPageX
+	func_table[0x6D] = ADCAbsolute
+	func_table[0x7D] = ADCAbsoluteX
+	func_table[0x79] = ADCAbsoluteY
+	func_table[0x61] = ADCIndirectX
+	func_table[0x71] = ADCIndirectY
 	//INC
 	func_table[0xE6] = INCZeroPage
 	func_table[0xF6] = INCZeroPageX
