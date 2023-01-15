@@ -688,3 +688,47 @@ func TestExecuteDECMEM(t *testing.T) {
 	}
 }
 
+func TestExecuteADC(t *testing.T) {
+  mapper := new(mappers.NoMapper)
+	cpu := new(processor.CPU)
+	cpu.Mapper = mapper
+	var value addrValue
+	var test_table = []struct {
+		A processor.Register
+		value addrValue
+		result byte
+		flags byte
+	}{
+	  {processor.Register{0x0F}, addrValue{0x01, 0x00, 0x01}, 0x10, 0b00000000},
+	  {processor.Register{0x1F}, addrValue{0x01, 0x00, 0xE2}, 0x01, 0b00000001},
+	  {processor.Register{0x00}, addrValue{0x01, 0x00, 0x00}, 0x00, 0b00000010},
+	  {processor.Register{0x1F}, addrValue{0x01, 0x00, 0xE1}, 0x00, 0b00000011},
+	  {processor.Register{0xBE}, addrValue{0x01, 0x00, 0xBF}, 0x7D, 0b01000001},
+	  {processor.Register{0x00}, addrValue{0x01, 0x00, 0x80}, 0x80, 0b11000000},
+	  {processor.Register{0xF6}, addrValue{0x01, 0x00, 0xFB}, 0xF1, 0b10000001},
+	}
+	t.Log("Given the need to test the ExecuteAND operation.")
+	{
+	  for _, element := range test_table {
+	    cpu.A = element.A
+	    cpu.P.Reset()
+	    value = element.value
+	    cpu.Addr.ADH = value.ADH
+	    cpu.Addr.ADL = value.ADL
+	    mapper.Write(value.ADH, value.ADL, value.Value)
+	    t.Logf("Context A:0x%02x Mem[0x%02x%02x]:0x%02x", cpu.A.Value, value.ADH, value.ADL, value.Value)
+	    processor.ExecuteADC(cpu)
+	    if cpu.A.Value == element.result {
+	      t.Logf("Got the expected result 0x%02x", element.result)
+	    }else {
+	      t.Errorf("There was a problem with the result, got 0x%02x expected 0x%02x", cpu.A.Value, element.result)
+	    }
+	    if cpu.P.Value == element.flags {
+	      t.Logf("Got the expected Flags %08b", cpu.P.Value)
+	    }else {
+	      t.Errorf("There was a problem with the flags, got %08b expected %08b", cpu.P.Value, element.flags)
+	    }
+	  }
+	}
+}
+
