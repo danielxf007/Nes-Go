@@ -9,6 +9,80 @@ func (addr* AddressBuffer) Increment(value byte) uint16 {
 
 //Arithmetic
 
+//ADC
+func updateFlagsADC(cpu* CPU, carry_bit byte, A_val_i byte, A_val_f byte) {
+	cpu.P.SetFlagC(carry_bit)
+	if A_val_f == 0x00 {
+		cpu.P.SetFlagZ(1)
+	}else {
+		cpu.P.SetFlagZ(0)
+	}
+	if GetNBit(A_val_i, 7) != GetNBit(A_val_f, 7) {
+	  cpu.P.SetFlagV(1)
+	}else {
+	  cpu.P.SetFlagV(0)
+	}
+	cpu.P.SetFlagN(GetNBit(A_val_f, 7))
+}
+
+func ExecuteADC(cpu* CPU) {
+  value := uint16(cpu.Mapper.Read(cpu.Addr.ADH, cpu.Addr.ADL))
+  value += (uint16(cpu.A.Value) + uint16(cpu.P.GetFlagC()))
+  carry_bit := byte(value >> 8)
+  A_val_i := cpu.A.Value
+  A_val_f := byte(value)
+  cpu.A.Value = A_val_f
+  updateFlagsADC(cpu, carry_bit, A_val_i, A_val_f)
+  cpu.PC.Increment(1) 
+}
+
+func ADCImmediate(cpu* CPU) uint16 {
+  ExecuteADC(cpu)
+	return 2
+}
+
+func ADCZeroPage(cpu* CPU) uint16 {
+  GetZeroPageAddr(cpu)
+  ExecuteADC(cpu)
+	return 3
+}
+
+func ADCZeroPageX(cpu* CPU) uint16 {
+	GetZeroPageXAddr(cpu)
+  ExecuteADC(cpu)
+	return 4
+}
+
+func ADCAbsolute(cpu* CPU) uint16 {
+	GetAbsoluteAddr(cpu)
+  ExecuteADC(cpu)
+	return 4
+}
+
+func ADCAbsoluteX(cpu* CPU) uint16 {
+	adjusted := GetAbsoluteXAddr(cpu)
+  ExecuteADC(cpu)
+	return 4 + adjusted
+}
+
+func ADCAbsoluteY(cpu* CPU) uint16 {
+	adjusted := GetAbsoluteYAddr(cpu)
+  ExecuteADC(cpu)
+	return 4 + adjusted
+}
+
+func ADCIndirectX(cpu* CPU) uint16 {
+	GetIndirectXAddr(cpu)
+  ExecuteADC(cpu)
+	return 6
+}
+
+func ADCIndirectY(cpu* CPU) uint16 {
+	adjusted := GetIndirectYAddr(cpu)
+  ExecuteADC(cpu)
+	return 5 + adjusted
+}
+
 //INCREMENT
 func updateFlagsINC(cpu* CPU, result byte) {
 	if result == 0x00 {
