@@ -109,6 +109,24 @@ func init() {
 	func_table[0x59] = EORAbsoluteY
 	func_table[0x41] = EORIndirectX
 	func_table[0x51] = EORIndirectY
+	//Boolean
+	//CMP
+	func_table[0xC9] = CMPImmediate
+	func_table[0xC5] = CMPZeroPage
+	func_table[0xD5] = CMPZeroPageX
+	func_table[0xCD] = CMPAbsolute
+	func_table[0xDD] = CMPAbsoluteX
+	func_table[0xD9] = CMPAbsoluteY
+	func_table[0xC1] = CMPIndirectX
+	func_table[0xD1] = CMPIndirectY
+	//CPX
+	func_table[0xE0] = CPXImmediate
+	func_table[0xE4] = CPXZeroPage
+	func_table[0xEC] = CPXAbsolute
+	//CPY
+	func_table[0xC0] = CPYImmediate
+	func_table[0xC4] = CPYZeroPage
+	func_table[0xCC] = CPYAbsolute
 	//Load
 	//LDA
 	func_table[0xA9] = LDAImmediate
