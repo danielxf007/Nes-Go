@@ -83,6 +83,86 @@ func ADCIndirectY(cpu* CPU) uint16 {
 	return 5 + adjusted
 }
 
+//SBC
+func updateFlagsSBC(cpu* CPU) {
+  if int8(cpu.A.Value) >= 0x00 { //There could be issues with this flag.
+    cpu.P.SetFlagC(1)
+  }else {
+    cpu.P.SetFlagC(0)
+  }
+	if cpu.A.Value == 0x00 {
+		cpu.P.SetFlagZ(1)
+	}else {
+		cpu.P.SetFlagZ(0)
+	}
+	if cpu.A.Value > 127 ||  int8(cpu.A.Value) < -128 {
+		cpu.P.SetFlagV(1)
+	}else {
+		cpu.P.SetFlagV(0)
+	}
+	cpu.P.SetFlagN(GetNBit(cpu.A.Value, 7))
+}
+
+func ExecuteSBC(cpu* CPU) {
+  var complemented_c_flag byte
+  if cpu.P.GetFlagC() == 0x00 {
+    complemented_c_flag = 0x01
+  }else {
+    complemented_c_flag = 0x00
+  } 
+  value := cpu.Mapper.Read(cpu.Addr.ADH, cpu.Addr.ADL)
+  cpu.A.Value = cpu.A.Value - value - complemented_c_flag
+  updateFlagsSBC(cpu)
+  cpu.PC.Increment(1) 
+}
+
+func SBCImmediate(cpu* CPU) uint16 {
+  ExecuteSBC(cpu)
+	return 2
+}
+
+func SBCZeroPage(cpu* CPU) uint16 {
+  GetZeroPageAddr(cpu)
+  ExecuteSBC(cpu)
+	return 3
+}
+
+func SBCZeroPageX(cpu* CPU) uint16 {
+	GetZeroPageXAddr(cpu)
+  ExecuteSBC(cpu)
+	return 4
+}
+
+func SBCAbsolute(cpu* CPU) uint16 {
+	GetAbsoluteAddr(cpu)
+  ExecuteSBC(cpu)
+	return 4
+}
+
+func SBCAbsoluteX(cpu* CPU) uint16 {
+	adjusted := GetAbsoluteXAddr(cpu)
+  ExecuteSBC(cpu)
+	return 4 + adjusted
+}
+
+func SBCAbsoluteY(cpu* CPU) uint16 {
+	adjusted := GetAbsoluteYAddr(cpu)
+  ExecuteSBC(cpu)
+	return 4 + adjusted
+}
+
+func SBCIndirectX(cpu* CPU) uint16 {
+	GetIndirectXAddr(cpu)
+  ExecuteSBC(cpu)
+	return 6
+}
+
+func SBCIndirectY(cpu* CPU) uint16 {
+	adjusted := GetIndirectYAddr(cpu)
+  ExecuteSBC(cpu)
+	return 5 + adjusted
+}
+
 //INCREMENT
 func updateFlagsINC(cpu* CPU, result byte) {
 	if result == 0x00 {
