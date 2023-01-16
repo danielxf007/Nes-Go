@@ -729,3 +729,37 @@ func TestExecuteSBC(t *testing.T) {
 	}
 }
 
+func TestExecuteCP(t *testing.T) {
+  mapper := new(mappers.NoMapper)
+	cpu := new(processor.CPU)
+	cpu.Mapper = mapper
+	var value addrValue
+	var test_table = []struct {
+		A processor.Register
+		value addrValue
+		flags byte
+	}{
+		{processor.Register{0x05}, addrValue{0x01, 0x00, 0x05}, 0b00000011},//A==Mem[x]
+	  {processor.Register{0x10}, addrValue{0x01, 0x00, 0x20}, 0b10000000},//A<Mem[x]
+	  {processor.Register{0x05}, addrValue{0x01, 0x00, 0x01}, 0b00000001},//A>Mem[x]
+	}
+	t.Log("Given the need to test the ExecuteCMP operation.")
+	{
+	  for _, element := range test_table {
+	    cpu.A = element.A
+	    cpu.P.Reset()
+	    value = element.value
+	    cpu.Addr.ADH = value.ADH
+	    cpu.Addr.ADL = value.ADL
+	    mapper.Write(value.ADH, value.ADL, value.Value)
+	    t.Logf("Context A:0x%02x Mem[0x%02x%02x]:0x%02x", cpu.A.Value, value.ADH, value.ADL, value.Value)
+	    processor.ExecuteCP(cpu, &cpu.A)
+	    if cpu.P.Value == element.flags {
+	      t.Logf("Got the expected Flags %08b", cpu.P.Value)
+	    }else {
+	      t.Errorf("There was a problem with the flags, got %08b expected %08b", cpu.P.Value, element.flags)
+	    }
+	  }
+	}
+}
+
