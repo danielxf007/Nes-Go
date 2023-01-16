@@ -587,6 +587,114 @@ func EORIndirectY(cpu* CPU) uint16 {
 	return 5 + adjusted
 }
 
+//Boolean
+
+//Compare
+func updateFlagsCP(cpu* CPU, reg_val byte, mem_val byte, result byte) {
+  if reg_val >= mem_val {
+		cpu.P.SetFlagC(1)
+	}else {
+		cpu.P.SetFlagC(0)
+	}
+	if result == 0x00 {
+		cpu.P.SetFlagZ(1)
+	}else {
+		cpu.P.SetFlagZ(0)
+	}
+	cpu.P.SetFlagN(GetNBit(result, 7))
+}
+
+func ExecuteCP(cpu* CPU, reg* Register) {
+  reg_val := reg.Value
+	value := cpu.Mapper.Read(cpu.Addr.ADH, cpu.Addr.ADL)
+	result := reg_val - value
+	updateFlagsCP(cpu, reg_val, value, result)
+	cpu.PC.Increment(1)
+}
+
+//CMP
+func CMPImmediate(cpu* CPU) uint16 {
+  ExecuteCP(cpu, &cpu.A)
+	return 2
+}
+
+func CMPZeroPage(cpu* CPU) uint16 {
+  GetZeroPageAddr(cpu)
+  ExecuteCP(cpu, &cpu.A)
+	return 3
+}
+
+func CMPZeroPageX(cpu* CPU) uint16 {
+	GetZeroPageXAddr(cpu)
+  ExecuteCP(cpu, &cpu.A)
+	return 4
+}
+
+func CMPAbsolute(cpu* CPU) uint16 {
+	GetAbsoluteAddr(cpu)
+  ExecuteCP(cpu, &cpu.A)
+	return 4
+}
+
+func CMPAbsoluteX(cpu* CPU) uint16 {
+	adjusted := GetAbsoluteXAddr(cpu)
+  ExecuteCP(cpu, &cpu.A)
+	return 4 + adjusted
+}
+
+func CMPAbsoluteY(cpu* CPU) uint16 {
+	adjusted := GetAbsoluteYAddr(cpu)
+  ExecuteCP(cpu, &cpu.A)
+	return 4 + adjusted
+}
+
+func CMPIndirectX(cpu* CPU) uint16 {
+	GetIndirectXAddr(cpu)
+  ExecuteCP(cpu, &cpu.A)
+	return 6
+}
+
+func CMPIndirectY(cpu* CPU) uint16 {
+	adjusted := GetIndirectYAddr(cpu)
+  ExecuteCP(cpu, &cpu.A)
+	return 5 + adjusted
+}
+
+//CPX
+func CPXImmediate(cpu* CPU) uint16 {
+  ExecuteCP(cpu, &cpu.X)
+	return 2
+}
+
+func CPXZeroPage(cpu* CPU) uint16 {
+  GetZeroPageAddr(cpu)
+  ExecuteCP(cpu, &cpu.X)
+	return 3
+}
+
+func CPXAbsolute(cpu* CPU) uint16 {
+	GetAbsoluteAddr(cpu)
+  ExecuteCP(cpu, &cpu.X)
+	return 4
+}
+
+//CPY
+func CPYImmediate(cpu* CPU) uint16 {
+  ExecuteCP(cpu, &cpu.Y)
+	return 2
+}
+
+func CPYZeroPage(cpu* CPU) uint16 {
+  GetZeroPageAddr(cpu)
+  ExecuteCP(cpu, &cpu.Y)
+	return 3
+}
+
+func CPYAbsolute(cpu* CPU) uint16 {
+	GetAbsoluteAddr(cpu)
+  ExecuteCP(cpu, &cpu.Y)
+	return 4
+}
 //Load Registers
 
 func updateFlagsLoadRegister(cpu* CPU, value byte) {
