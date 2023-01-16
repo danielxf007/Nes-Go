@@ -688,7 +688,7 @@ func TestExecuteDECMEM(t *testing.T) {
 	}
 }
 
-func TestExecuteADC(t *testing.T) {
+func TestExecuteSBC(t *testing.T) {
   mapper := new(mappers.NoMapper)
 	cpu := new(processor.CPU)
 	cpu.Mapper = mapper
@@ -699,25 +699,22 @@ func TestExecuteADC(t *testing.T) {
 		result byte
 		flags byte
 	}{
-	  {processor.Register{0x0F}, addrValue{0x01, 0x00, 0x01}, 0x10, 0b00000000},
-	  {processor.Register{0x1F}, addrValue{0x01, 0x00, 0xE2}, 0x01, 0b00000001},
-	  {processor.Register{0x00}, addrValue{0x01, 0x00, 0x00}, 0x00, 0b00000010},
-	  {processor.Register{0x1F}, addrValue{0x01, 0x00, 0xE1}, 0x00, 0b00000011},
-	  {processor.Register{0xBE}, addrValue{0x01, 0x00, 0xBF}, 0x7D, 0b01000001},
-	  {processor.Register{0x00}, addrValue{0x01, 0x00, 0x80}, 0x80, 0b11000000},
-	  {processor.Register{0xF6}, addrValue{0x01, 0x00, 0xFB}, 0xF1, 0b10000001},
+		{processor.Register{0x05}, addrValue{0x01, 0x00, 0x05}, 0x00, 0b00000011},//substract the same number 
+	  {processor.Register{0x05}, addrValue{0x01, 0x00, 0x03}, 0x02, 0b00000001},//substract with borrow (c==1->no borrow); positive result 
+	  {processor.Register{0x05}, addrValue{0x01, 0x00, 0x06}, 0xFF, 0b11000000},//substract with borrow (c==0->borrow); negative result
 	}
-	t.Log("Given the need to test the ExecuteAND operation.")
+	t.Log("Given the need to test the ExecuteSBC operation.")
 	{
 	  for _, element := range test_table {
 	    cpu.A = element.A
 	    cpu.P.Reset()
+	    cpu.P.SetFlagC(1)
 	    value = element.value
 	    cpu.Addr.ADH = value.ADH
 	    cpu.Addr.ADL = value.ADL
 	    mapper.Write(value.ADH, value.ADL, value.Value)
 	    t.Logf("Context A:0x%02x Mem[0x%02x%02x]:0x%02x", cpu.A.Value, value.ADH, value.ADL, value.Value)
-	    processor.ExecuteADC(cpu)
+	    processor.ExecuteSBC(cpu)
 	    if cpu.A.Value == element.result {
 	      t.Logf("Got the expected result 0x%02x", element.result)
 	    }else {
