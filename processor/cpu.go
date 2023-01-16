@@ -42,6 +42,15 @@ func init() {
 	func_table[0x79] = ADCAbsoluteY
 	func_table[0x61] = ADCIndirectX
 	func_table[0x71] = ADCIndirectY
+	//SBC
+	func_table[0xE9] = SBCImmediate
+	func_table[0xE5] = SBCZeroPage
+	func_table[0xF5] = SBCZeroPageX
+	func_table[0xED] = SBCAbsolute
+	func_table[0xFD] = SBCAbsoluteX
+	func_table[0xF9] = SBCAbsoluteY
+	func_table[0xE1] = SBCIndirectX
+	func_table[0xF1] = SBCIndirectY
 	//INC
 	func_table[0xE6] = INCZeroPage
 	func_table[0xF6] = INCZeroPageX
