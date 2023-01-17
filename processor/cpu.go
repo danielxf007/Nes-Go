@@ -70,6 +70,7 @@ func init() {
 	//DEY
 	func_table[0x88] = DEY
 	//Bitwise
+	//Shifts
 	//ASL
 	func_table[0x0A] = ASLA
 	func_table[0x06] = ASLZeroPage
@@ -82,6 +83,12 @@ func init() {
 	func_table[0x56] = LSRZeroPageX
 	func_table[0x4E] = LSRAbsolute
 	func_table[0x5E] = LSRAbsoluteX
+	//ROL
+	func_table[0x2A] = ROLA
+	func_table[0x26] = ROLZeroPage
+	func_table[0x36] = ROLZeroPageX
+	func_table[0x2E] = ROLAbsolute
+	func_table[0x3E] = ROLAbsoluteX
 	//AND
 	func_table[0x29] = ANDImmediate
 	func_table[0x25] = ANDZeroPage
