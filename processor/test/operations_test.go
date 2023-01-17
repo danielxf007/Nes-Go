@@ -763,3 +763,81 @@ func TestExecuteCP(t *testing.T) {
 	}
 }
 
+func TestExecuteROLA(t *testing.T) {
+  mapper := new(mappers.NoMapper)
+	cpu := new(processor.CPU)
+	cpu.Mapper = mapper
+	var test_table = []struct {
+		A processor.Register
+		result byte
+		flags_i byte
+		flags_f byte
+	}{
+	  {processor.Register{0xC2}, 0x84, 0b00000000, 0b10000001},
+	  {processor.Register{0x80}, 0x01, 0b00000001, 0b00000001},
+	  {processor.Register{0x80}, 0x00, 0b00000000, 0b00000011},
+	}
+	t.Log("Given the need to test the ExecuteROLA operation.")
+	{
+	  for _, element := range test_table {
+	    cpu.A = element.A
+	    cpu.P.Value = element.flags_i
+	    processor.ExecuteROLA(cpu)
+	    t.Logf("Context A:%08b", cpu.A.Value)
+	    if cpu.A.Value == element.result {
+	      t.Logf("Got the expected result %08b", element.result)
+	    }else {
+	      t.Errorf("There was a problem with the result, got %08b expected %08b", cpu.A.Value, element.result)
+	    }
+	    if cpu.P.Value == element.flags_f {
+	      t.Logf("Got the expected Flags %08b", cpu.P.Value)
+	    }else {
+	      t.Errorf("There was a problem with the flags, got %08b expected %08b", cpu.P.Value, element.flags_f)
+	    }
+	  }
+	}
+}
+
+func TestExecuteROLMEM(t *testing.T) {
+  mapper := new(mappers.NoMapper)
+	cpu := new(processor.CPU)
+	cpu.Mapper = mapper
+	var value addrValue
+	var mem_value byte
+	var test_table = []struct {
+		value addrValue
+		result byte
+		flags_i byte
+		flags_f byte
+	}{
+	  {addrValue{0x01, 0x00, 0xC2}, 0x84, 0b00000000, 0b10000001},
+	  {addrValue{0x02, 0x00, 0x80}, 0x01, 0b00000001, 0b00000001},
+	  {addrValue{0x04, 0x00, 0x80}, 0x00, 0b00000000, 0b00000011},
+
+	}
+	t.Log("Given the need to test the ExecuteLSRMEM operation.")
+	{
+	  for _, element := range test_table {
+	    cpu.P.Value = element.flags_i
+	    value = element.value
+	    cpu.Addr.ADH = value.ADH
+	    cpu.Addr.ADL = value.ADL
+	    mapper.Write(value.ADH, value.ADL, value.Value)
+	    t.Logf("Context Mem[0x%02x%02x]:%08b", value.ADH, value.ADL, value.Value)
+	    processor.ExecuteROLMEM(cpu)
+	    mem_value = mapper.Read(value.ADH, value.ADL)
+	    if mem_value == element.result {
+	      t.Logf("Got the expected result Mem[0x%02x%02x]:%08b", value.ADH, value.ADL, mem_value)
+	    }else {
+	      t.Errorf("There was a problem with the result, got Mem[0x%02x%02x]:%08b expected %08b",
+	      value.ADH, value.ADL, mem_value, element.result)
+	    }
+	    if cpu.P.Value == element.flags_f {
+	      t.Logf("Got the expected Flags %08b", cpu.P.Value)
+	    }else {
+	      t.Errorf("There was a problem with the flags, got %08b expected %08b", cpu.P.Value, element.flags_f)
+	    }
+	  }
+	}
+}
+
