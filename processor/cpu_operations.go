@@ -285,6 +285,8 @@ func DEY(cpu* CPU) uint16 {
 
 //Bitwise
 
+//Shifts
+
 //ASL
 func updateFlagsASL(cpu* CPU, bit byte, result byte) {
 	cpu.P.SetFlagC(bit)
@@ -392,6 +394,63 @@ func LSRAbsolute(cpu* CPU) uint16 {
 func LSRAbsoluteX(cpu* CPU) uint16 {
 	GetAbsoluteXAddr(cpu)
   ExecuteLSRMEM(cpu)
+	return 7
+}
+
+//ROL
+func updateFlagsROL(cpu* CPU, bit byte, result byte) {
+	cpu.P.SetFlagC(bit)
+	if result == 0x00 {
+		cpu.P.SetFlagZ(1)
+	}else {
+		cpu.P.SetFlagZ(0)
+	}
+	cpu.P.SetFlagN(GetNBit(result, 7))
+}
+
+func ExecuteROLA(cpu* CPU) {
+	bit := GetNBit(cpu.A.Value, 7)
+	cpu.A.Value <<= 1
+	cpu.A.Value |= cpu.P.GetFlagC()
+	updateFlagsROL(cpu, bit, cpu.A.Value)
+}
+
+func ExecuteROLMEM(cpu* CPU) {
+	value := cpu.Mapper.Read(cpu.Addr.ADH, cpu.Addr.ADL)
+	bit := GetNBit(value, 7)
+	value <<= 1
+	value |= cpu.P.GetFlagC()
+	updateFlagsROL(cpu, bit, value)
+	cpu.Mapper.Write(cpu.Addr.ADH, cpu.Addr.ADL, value)
+	cpu.PC.Increment(1)
+}
+
+func ROLA(cpu* CPU) uint16 {
+	ExecuteROLA(cpu)
+	return 2
+}
+
+func ROLZeroPage(cpu* CPU) uint16 {
+  GetZeroPageAddr(cpu)
+  ExecuteROLMEM(cpu)
+	return 5
+}
+
+func ROLZeroPageX(cpu* CPU) uint16 {
+	GetZeroPageXAddr(cpu)
+  ExecuteROLMEM(cpu)
+	return 6
+}
+
+func ROLAbsolute(cpu* CPU) uint16 {
+	GetAbsoluteAddr(cpu)
+	ExecuteROLMEM(cpu)
+	return 6
+}
+
+func ROLAbsoluteX(cpu* CPU) uint16 {
+	GetAbsoluteXAddr(cpu)
+  ExecuteROLMEM(cpu)
 	return 7
 }
 
