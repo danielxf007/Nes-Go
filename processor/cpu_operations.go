@@ -454,6 +454,63 @@ func ROLAbsoluteX(cpu* CPU) uint16 {
 	return 7
 }
 
+//ROR
+func updateFlagsROR(cpu* CPU, bit byte, result byte) {
+	cpu.P.SetFlagC(bit)
+	if result == 0x00 {
+		cpu.P.SetFlagZ(1)
+	}else {
+		cpu.P.SetFlagZ(0)
+	}
+	cpu.P.SetFlagN(GetNBit(result, 7))
+}
+
+func ExecuteRORA(cpu* CPU) {
+	bit := GetNBit(cpu.A.Value, 0)
+	cpu.A.Value >>= 1
+	cpu.A.Value |= (cpu.P.GetFlagC() << 7)
+	updateFlagsROR(cpu, bit, cpu.A.Value)
+}
+
+func ExecuteRORMEM(cpu* CPU) {
+	value := cpu.Mapper.Read(cpu.Addr.ADH, cpu.Addr.ADL)
+	bit := GetNBit(value, 0)
+	value >>= 1
+	value |= (cpu.P.GetFlagC() << 7)
+	updateFlagsROR(cpu, bit, value)
+	cpu.Mapper.Write(cpu.Addr.ADH, cpu.Addr.ADL, value)
+	cpu.PC.Increment(1)
+}
+
+func RORA(cpu* CPU) uint16 {
+	ExecuteRORA(cpu)
+	return 2
+}
+
+func RORZeroPage(cpu* CPU) uint16 {
+  GetZeroPageAddr(cpu)
+  ExecuteRORMEM(cpu)
+	return 5
+}
+
+func RORZeroPageX(cpu* CPU) uint16 {
+	GetZeroPageXAddr(cpu)
+  ExecuteRORMEM(cpu)
+	return 6
+}
+
+func RORAbsolute(cpu* CPU) uint16 {
+	GetAbsoluteAddr(cpu)
+	ExecuteRORMEM(cpu)
+	return 6
+}
+
+func RORAbsoluteX(cpu* CPU) uint16 {
+	GetAbsoluteXAddr(cpu)
+  ExecuteRORMEM(cpu)
+	return 7
+}
+
 //AND
 func updateFlagsAND(cpu* CPU, result byte) {
 	if result == 0x00 {
