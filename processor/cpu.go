@@ -89,6 +89,12 @@ func init() {
 	func_table[0x36] = ROLZeroPageX
 	func_table[0x2E] = ROLAbsolute
 	func_table[0x3E] = ROLAbsoluteX
+	//ROR
+	func_table[0x6A] = RORA
+	func_table[0x66] = RORZeroPage
+	func_table[0x76] = RORZeroPageX
+	func_table[0x6E] = RORAbsolute
+	func_table[0x7E] = RORAbsoluteX
 	//AND
 	func_table[0x29] = ANDImmediate
 	func_table[0x25] = ANDZeroPage
