@@ -876,44 +876,37 @@ func TestExecuteRORA(t *testing.T) {
 	}
 }
 
-func TestExecuteRORMEM(t *testing.T) {
+func TestExecuteExecuteJMP(t *testing.T) {
   mapper := new(mappers.NoMapper)
 	cpu := new(processor.CPU)
 	cpu.Mapper = mapper
-	var value addrValue
-	var mem_value byte
+	var addr_l, addr_h addrValue
+	var expected_addr processor.AddressBuffer
 	var test_table = []struct {
-		value addrValue
-		result byte
-		flags_i byte
-		flags_f byte
+		addr_l addrValue
+		addr_h addrValue
+		expected_addr processor.AddressBuffer
 	}{
-	  {addrValue{0x01, 0x00, 0x81}, 0xC0, 0b00000001, 0b10000001},
-	  {addrValue{0x02, 0x00, 0x81}, 0x40, 0b00000000, 0b00000001},
-	  {addrValue{0x04, 0x00, 0x01}, 0x00, 0b00000000, 0b00000011},
+	  {addrValue{0x01, 0x00, 0xFF}, addrValue{0x01, 0x01, 0x0F}, processor.AddressBuffer{0x0F, 0xFF}},
 
 	}
-	t.Log("Given the need to test the ExecuteLSRMEM operation.")
+	t.Log("Given the need to test the ExecuteJMP operation.")
 	{
 	  for _, element := range test_table {
-	    cpu.P.Value = element.flags_i
-	    value = element.value
-	    cpu.Addr.ADH = value.ADH
-	    cpu.Addr.ADL = value.ADL
-	    mapper.Write(value.ADH, value.ADL, value.Value)
-	    t.Logf("Context Mem[0x%02x%02x]:%08b", value.ADH, value.ADL, value.Value)
-	    processor.ExecuteRORMEM(cpu)
-	    mem_value = mapper.Read(value.ADH, value.ADL)
-	    if mem_value == element.result {
-	      t.Logf("Got the expected result Mem[0x%02x%02x]:%08b", value.ADH, value.ADL, mem_value)
+	    addr_l = element.addr_l
+	    cpu.Addr.ADH, cpu.Addr.ADL = addr_l.ADH, addr_l.ADL
+	    addr_h = element.addr_h
+	    expected_addr = element.expected_addr
+	    mapper.Write(addr_l.ADH, addr_l.ADL, addr_l.Value)
+	    mapper.Write(addr_h.ADH, addr_h.ADL, addr_h.Value)
+	    t.Logf("Context PC:0x%02x%02x Mem[0x%02x%02x]:0x%02x Mem[0x%02x%02x]:0x%02x",
+	    cpu.PC.ADH, cpu.PC.ADL, addr_l.ADH, addr_l.ADL, addr_l.Value, addr_h.ADH, addr_h.ADL, addr_h.Value)
+	    processor.ExecuteJMP(cpu)
+	    if cpu.PC.ADH == expected_addr.ADH && cpu.PC.ADL == expected_addr.ADL {
+	      t.Logf("Got the expected result Addres 0x%02x%02x", expected_addr.ADH, expected_addr.ADL)
 	    }else {
-	      t.Errorf("There was a problem with the result, got Mem[0x%02x%02x]:%08b expected %08b",
-	      value.ADH, value.ADL, mem_value, element.result)
-	    }
-	    if cpu.P.Value == element.flags_f {
-	      t.Logf("Got the expected Flags %08b", cpu.P.Value)
-	    }else {
-	      t.Errorf("There was a problem with the flags, got %08b expected %08b", cpu.P.Value, element.flags_f)
+	      t.Errorf("There was a problem with the Address, got 0x%02x%02x expected 0x%02x%02x", 
+	      cpu.PC.ADH, cpu.PC.ADL, expected_addr.ADH, expected_addr.ADL)
 	    }
 	  }
 	}
