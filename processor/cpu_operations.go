@@ -1172,6 +1172,27 @@ func CLV(cpu* CPU) uint16 {
   return 2
 }
 
+//Program Control
+
+//Jump
+func ExecuteJMP(cpu* CPU) {
+	cpu.PC.ADL = cpu.Mapper.Read(cpu.Addr.ADH, cpu.Addr.ADL)
+	cpu.Addr.Increment(1)
+	cpu.PC.ADH = cpu.Mapper.Read(cpu.Addr.ADH, cpu.Addr.ADL)
+}
+
+func JMPAbsolute(cpu* CPU) uint16 {
+	GetAbsoluteAddr(cpu)
+	ExecuteJMP(cpu)
+	return 3
+}
+
+func JMPIndirect(cpu* CPU) uint16 {
+	GetIndirectAddr(cpu)
+	ExecuteJMP(cpu)
+	return 5
+}
+
 func (cpu* CPU) Execute(n_cycles uint16) {
 	var current_cycles uint16 = 0
 	for current_cycles < n_cycles {
