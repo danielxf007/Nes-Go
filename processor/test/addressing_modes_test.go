@@ -304,3 +304,47 @@ func TestGetIndirectYAddr(t *testing.T) {
 	}
 }
 
+func TestGetIndirectAddr(t *testing.T) {
+	mapper := new(mappers.NoMapper)
+	cpu := new(processor.CPU)
+	cpu.Mapper = mapper
+	var b2, b3, addr_l, addr_h addrValue
+	var expected_addr processor.AddressBuffer
+	var test_table = []struct {
+	  pc processor.ProgramCounter
+	  b2 addrValue
+	  b3 addrValue
+	  addr_l addrValue
+	  addr_h addrValue
+	  expected_addr processor.AddressBuffer
+	}{
+		{processor.ProgramCounter{0x01, 0xFF}, addrValue{0x01, 0xFF, 0x40}, addrValue{0x02, 0x00, 0x0A}, 
+		addrValue{0x0A, 0x40, 0xFF}, addrValue{0x0A, 0x41, 0x03}, processor.AddressBuffer{0x03, 0xFF}},
+	}
+	t.Log("Given the need to test the Absolute Address.")
+	{
+	  for _, element := range test_table {
+	    cpu.PC = element.pc
+	    b2 = element.b2
+	    b3 = element.b3
+	    addr_l = element.addr_l
+	    addr_h = element.addr_h
+	    expected_addr = element.expected_addr
+	    mapper.Write(b2.ADH, b2.ADL, b2.Value)
+	    mapper.Write(b3.ADH, b3.ADL, b3.Value)
+	    mapper.Write(addr_l.ADH, addr_l.ADL, addr_l.Value)
+	    mapper.Write(addr_h.ADH, addr_h.ADL, addr_h.Value)
+	    t.Logf("Context PC:0x%02x%02x Mem[0x%02x%02x]:0x%02x Mem[0x%02x%02x]:0x%02x Mem[0x%02x%02x]:0x%02x Mem[0x%02x%02x]:0x%02x",
+	    cpu.PC.ADH, cpu.PC.ADL, b2.ADH, b2.ADL, b2.Value, b3.ADH, b3.ADL, b3.Value,
+	    addr_l.ADH, addr_l.ADL, addr_l.Value, addr_h.ADH, addr_h.ADL, addr_h.Value)
+	    processor.GetIndirectAddr(cpu)
+	    if cpu.Addr.ADH == expected_addr.ADH && cpu.Addr.ADL == expected_addr.ADL {
+	      t.Logf("Got the expected result Addres 0x%02x%02x", expected_addr.ADH, expected_addr.ADL)
+	    }else {
+	      t.Errorf("There was a problem with the Address, got %02x%02x expected %02x%02x", 
+	      cpu.Addr.ADH, cpu.Addr.ADL, expected_addr.ADH, expected_addr.ADL)
+	    }
+	  }
+	}
+}
+
