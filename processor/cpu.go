@@ -214,5 +214,10 @@ func init() {
 	func_table[0xF8] = SED
 	//CLV
 	func_table[0xB8] = CLV
+	//Program Control
+	//JMP
+	func_table[0x4C] = JMPAbsolute
+	func_table[0x6C] = CLV
+	
 
 }
