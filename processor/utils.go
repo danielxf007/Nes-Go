@@ -55,6 +55,16 @@ func GetIndirectYAddr(cpu* CPU) uint16 {
   return cpu.Addr.Increment(cpu.Y.Value)
 }
 
+func GetIndirectAddr(cpu* CPU) {
+  cpu.Addr.ADL = cpu.Mapper.Read(cpu.PC.ADH, cpu.PC.ADL)
+  cpu.PC.Increment(1)
+  cpu.Addr.ADH = cpu.Mapper.Read(cpu.PC.ADH, cpu.PC.ADL)
+  aux_adl := cpu.Mapper.Read(cpu.Addr.ADH, cpu.Addr.ADL)
+  cpu.Addr.Increment(1)
+  aux_adh := cpu.Mapper.Read(cpu.Addr.ADH, cpu.Addr.ADL)
+  cpu.Addr.ADH, cpu.Addr.ADL = aux_adh, aux_adl
+}
+
 //Bit
 func GetNBit(value byte, n byte) byte {
   return ((value >> n) & 0x01) 
