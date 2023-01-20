@@ -1193,6 +1193,70 @@ func JMPIndirect(cpu* CPU) uint16 {
 	return 5
 }
 
+//Branching
+func ExecuteBranch(cpu* CPU, flag_cond bool) uint16 {
+  offset := cpu.Mapper.Read(cpu.PC.ADH, cpu.PC.ADL)
+  var adjusted, branched uint16 = 0, 0
+  if flag_cond {
+    branched = 1
+    if GetNBit(offset, 7) == 1 {
+      adjusted = cpu.PC.Decrement(-offset)
+    }else {
+      adjusted = cpu.PC.Increment(offset)
+    }
+  }
+  cpu.PC.Increment(1)
+  return branched+adjusted
+}
+
+//BCC
+func BCC(cpu* CPU) uint16 {
+  cycles := ExecuteBranch(cpu, cpu.P.GetFlagC() == 0)
+  return 2 + cycles
+}
+
+//BCS
+func BCS(cpu* CPU) uint16 {
+  cycles := ExecuteBranch(cpu, cpu.P.GetFlagC() == 1)
+  return 2 + cycles
+}
+
+//BEQ
+func BEQ(cpu* CPU) uint16 {
+  cycles := ExecuteBranch(cpu, cpu.P.GetFlagZ() == 1)
+  return 2 + cycles
+}
+
+//BMI
+func BMI(cpu* CPU) uint16 {
+  cycles := ExecuteBranch(cpu, cpu.P.GetFlagN() == 1)
+  return 2 + cycles
+}
+
+//BNE
+func BNE(cpu* CPU) uint16 {
+  cycles := ExecuteBranch(cpu, cpu.P.GetFlagZ() == 0)
+  return 2 + cycles
+}
+
+//BPL
+func BPL(cpu* CPU) uint16 {
+  cycles := ExecuteBranch(cpu, cpu.P.GetFlagN() == 0)
+  return 2 + cycles
+}
+
+//BVC
+func BVC(cpu* CPU) uint16 {
+  cycles := ExecuteBranch(cpu, cpu.P.GetFlagV() == 0)
+  return 2 + cycles
+}
+
+//BVS
+func BVS(cpu* CPU) uint16 {
+  cycles := ExecuteBranch(cpu, cpu.P.GetFlagV() == 1)
+  return 2 + cycles
+}
+
 func (cpu* CPU) Execute(n_cycles uint16) {
 	var current_cycles uint16 = 0
 	for current_cycles < n_cycles {
