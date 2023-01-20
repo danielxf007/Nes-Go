@@ -912,3 +912,49 @@ func TestExecuteExecuteJMP(t *testing.T) {
 	}
 }
 
+func TestExecuteBranch(t *testing.T) {
+	mapper := new(mappers.NoMapper)
+	cpu := new(processor.CPU)
+	cpu.Mapper = mapper
+	var b2 addrValue
+	var expected_addr processor.AddressBuffer
+	var cycles uint16
+	var test_table = []struct {
+	  pc processor.ProgramCounter
+	  b2 addrValue
+	  flag_cond bool
+	  expected_addr processor.AddressBuffer
+	  cycles uint16
+	}{
+	  {processor.ProgramCounter{0x01, 0x00}, addrValue{0x01, 0x00, 0x40}, false, processor.AddressBuffer{0x01, 0x01}, 0},
+		{processor.ProgramCounter{0x01, 0x00}, addrValue{0x01, 0x00, 0x40}, true, processor.AddressBuffer{0x01, 0x41}, 1},
+		{processor.ProgramCounter{0x01, 0xFF}, addrValue{0x01, 0xFF, 0x0A}, true, processor.AddressBuffer{0x02, 0x0A}, 2},
+		{processor.ProgramCounter{0x01, 0xFF}, addrValue{0x01, 0xFF, 0xFF}, true, processor.AddressBuffer{0x01, 0xFF}, 1},
+		{processor.ProgramCounter{0x01, 0x05}, addrValue{0x01, 0x05, 0xF6}, true, processor.AddressBuffer{0x00, 0xFC}, 2},
+	}
+	t.Log("Given the need to test the Absolute Address.")
+	{
+	  for _, element := range test_table {
+	    cpu.PC = element.pc
+	    b2 = element.b2
+	    expected_addr = element.expected_addr
+	    mapper.Write(b2.ADH, b2.ADL, b2.Value)
+	    cycles = element.cycles
+	    t.Logf("Context PC:0x%02x%02x Mem[0x%02x%02x]:0x%02x",
+	    cpu.PC.ADH, cpu.PC.ADL, b2.ADH, b2.ADL, b2.Value)
+	    cycles = processor.ExecuteBranch(cpu, element.flag_cond)
+	    if cpu.PC.ADH == expected_addr.ADH && cpu.PC.ADL == expected_addr.ADL {
+	      t.Logf("Got the expected result PC 0x%02x%02x", expected_addr.ADH, expected_addr.ADL)
+	    }else {
+	      t.Errorf("There was a problem with the PC, got 0x%02x%02x expected 0x%02x%02x", 
+	      cpu.PC.ADH, cpu.PC.ADL, expected_addr.ADH, expected_addr.ADL)
+	    }
+	    if cycles == element.cycles {
+	      t.Logf("Got the expected adjusted %d", cycles)
+	    }else {
+	      t.Logf("There was a problem with cycles, got %d expected %d", cycles, element.cycles)
+	    }
+	  }
+	}
+}
+
