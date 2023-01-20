@@ -30,7 +30,15 @@ func (pc* ProgramCounter) Increment(value byte) uint16 {
 }
 
 func (pc* ProgramCounter) Decrement(value byte) uint16 {
-	return 0
+	var borrow byte
+	if pc.ADL < value {
+	  borrow = 1
+	}else {
+	  borrow = 0
+	}
+	pc.ADL -= value
+	pc.ADH -= borrow
+	return uint16(borrow)
 }
 
 type FlagRegisterOperations interface {
