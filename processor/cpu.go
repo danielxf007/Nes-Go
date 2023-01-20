@@ -218,6 +218,23 @@ func init() {
 	//JMP
 	func_table[0x4C] = JMPAbsolute
 	func_table[0x6C] = CLV
+	//Branching
+	//BCC
+	func_table[0x90] = BCC
+	//BCS
+	func_table[0xB0] = BCS
+	//BEQ
+	func_table[0xF0] = BEQ
+	//BMI
+	func_table[0x30] = BMI
+	//BNE
+	func_table[0xD0] = BNE
+	//BPL
+	func_table[0x10] = BPL
+	//BVC
+	func_table[0x50] = BVC
+	//BVS
+	func_table[0x70] = BVS
 	
 
 }
