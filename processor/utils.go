@@ -65,16 +65,6 @@ func GetIndirectAddr(cpu* CPU) {
   cpu.Addr.ADH, cpu.Addr.ADL = aux_adh, aux_adl
 }
 
-func GetRelativeAddr(cpu* CPU) uint16 {
-  offset := cpu.Mapper.Read(cpu.PC.ADH, cpu.PC.ADL)
-  var adjusted uint16
-  if GetNBit(offset, 7) == 1 {
-    adjusted = cpu.PC.Decrement(-offset)
-  }else {
-    adjusted = cpu.PC.Increment(offset)
-  }
-  return adjusted
-}
 //Bit
 func GetNBit(value byte, n byte) byte {
   return ((value >> n) & 0x01) 
