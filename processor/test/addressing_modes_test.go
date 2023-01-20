@@ -347,4 +347,3 @@ func TestGetIndirectAddr(t *testing.T) {
 	  }
 	}
 }
-
