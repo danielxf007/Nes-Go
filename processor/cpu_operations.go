@@ -1105,15 +1105,18 @@ func updateFlagsPull(cpu* CPU, value byte) {
 	cpu.P.SetFlagN(GetNBit(value, 7))
 }
 
-func ExecutePullA(cpu* CPU) {
+func ExecutePull(cpu* CPU) byte {
   cpu.SP.Value++
-  cpu.A.Value = cpu.Mapper.Read(0x01, cpu.SP.Value)
+  return cpu.Mapper.Read(0x01, cpu.SP.Value)
+}
+
+func ExecutePullA(cpu* CPU) {
+  cpu.A.Value = ExecutePull(cpu)
   updateFlagsPull(cpu, cpu.A.Value)
 }
 
 func ExecutePullP(cpu* CPU) {
-  cpu.SP.Value++
-  cpu.P.Value = cpu.Mapper.Read(0x01, cpu.SP.Value)
+  cpu.P.Value = ExecutePull(cpu)
 }
 
 //PLA
@@ -1193,6 +1196,33 @@ func JMPIndirect(cpu* CPU) uint16 {
 	return 5
 }
 
+//JSR
+func ExecuteJSR(cpu* CPU) {
+  aux_adl := cpu.Mapper.Read(cpu.PC.ADH, cpu.PC.ADL)
+  cpu.PC.Increment(1)
+  aux_adh := cpu.Mapper.Read(cpu.PC.ADH, cpu.PC.ADL)
+  ExecutePush(cpu, cpu.PC.ADH)
+  ExecutePush(cpu, cpu.PC.ADL)
+  cpu.PC.ADL = aux_adl
+  cpu.PC.ADH = aux_adh
+}
+
+func JSR(cpu* CPU) uint16 {
+  ExecuteJSR(cpu)
+  return 6
+}
+
+//RTS
+func ExecuteRTS(cpu* CPU) {
+  cpu.PC.ADL = aux_adl
+  cpu.PC.ADH = aux_adh
+  cpu.PC.Increment(1)
+}
+
+func JSR(cpu* CPU) uint16 {
+  ExecuteJSR(cpu)
+  return 6
+}
 
 //BIT
 func updateFlagsBIT(cpu* CPU, result byte) {
