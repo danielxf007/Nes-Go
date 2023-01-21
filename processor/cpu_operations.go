@@ -1224,6 +1224,16 @@ func RTS(cpu* CPU) uint16 {
   return 6
 }
 
+//BRK
+func ExecuteBRK(cpu* CPU) {
+  cpu.PC.Increment(1)
+  ExecutePush(cpu, cpu.PC.ADH)
+  ExecutePush(cpu, cpu.PC.ADL)
+  ExecutePush(cpu, (cpu.P.Value|0x10))
+  cpu.PC.ADL = 0xFE
+  cpu.PC.ADH = 0xFF
+}
+
 //BIT
 func updateFlagsBIT(cpu* CPU, result byte) {
 	if result == 0x00 {
