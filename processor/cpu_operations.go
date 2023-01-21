@@ -1214,13 +1214,13 @@ func JSR(cpu* CPU) uint16 {
 
 //RTS
 func ExecuteRTS(cpu* CPU) {
-  cpu.PC.ADL = aux_adl
-  cpu.PC.ADH = aux_adh
+  cpu.PC.ADL = ExecutePull(cpu)
+  cpu.PC.ADH = ExecutePull(cpu)
   cpu.PC.Increment(1)
 }
 
-func JSR(cpu* CPU) uint16 {
-  ExecuteJSR(cpu)
+func RTS(cpu* CPU) uint16 {
+  ExecuteRTS(cpu)
   return 6
 }
 
