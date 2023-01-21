@@ -222,6 +222,8 @@ func init() {
 	func_table[0x20] = JSR
 	//RTS
 	func_table[0x60] = RTS
+	//BRK
+	func_table[0x00] = BRK
 	//BIT
 	func_table[0x24] = BITZeroPage
 	func_table[0x2C] = BITAbsolute
