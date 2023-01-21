@@ -912,6 +912,66 @@ func TestExecuteExecuteJMP(t *testing.T) {
 	}
 }
 
+func TestExecuteJSR(t *testing.T) {
+	mapper := new(mappers.NoMapper)
+	cpu := new(processor.CPU)
+	cpu.Mapper = mapper
+	var addr_l, addr_h processor.AddressBuffer
+	var b2, b3 addrValue
+	var expected_pc processor.ProgramCounter
+	var test_table = []struct {
+	  pc processor.ProgramCounter
+	  sp byte
+	  b2 addrValue
+	  b3 addrValue
+	  expected_pc processor.ProgramCounter
+	  addr_l processor.AddressBuffer
+	  addr_h processor.AddressBuffer
+	  expected_sp byte
+	}{
+	  {processor.ProgramCounter{0x01, 0x01}, 0xFF, addrValue{0x01, 0x01, 0xFF}, addrValue{0x01, 0x02, 0x40},
+	  processor.ProgramCounter{0x40, 0xFF}, processor.AddressBuffer{0x01, 0xFE}, processor.AddressBuffer{0x01, 0xFF}, 0xFD},
+	}
+	t.Log("Given the need to test the ExecuteJSR.")
+	{
+	  for _, element := range test_table {
+	    cpu.PC = element.pc
+	    cpu.SP.Value = element.sp 
+	    b2, b3 = element.b2, element.b3
+	    expected_pc = element.expected_pc
+	    mapper.Write(b2.ADH, b2.ADL, b2.Value)
+	    mapper.Write(b3.ADH, b3.ADL, b3.Value)
+	    addr_l, addr_h  = element.addr_l, element.addr_h
+	    t.Logf("Context PC:0x%02x%02x Mem[0x%02x%02x]:0x%02x Mem[0x%02x%02x]:0x%02x",
+	    cpu.PC.ADH, cpu.PC.ADL, b2.ADH, b2.ADL, b2.Value, b3.ADH, b3.ADL, b3.Value)
+	    processor.ExecuteJSR(cpu)
+	    if cpu.PC.ADH == expected_pc.ADH && cpu.PC.ADL == expected_pc.ADL {
+	      t.Logf("Got the expected result PC 0x%02x%02x", cpu.PC.ADH, cpu.PC.ADL)
+	    }else {
+	      t.Errorf("There was a problem with the PC, got 0x%02x%02x expected 0x%02x%02x", 
+	      cpu.PC.ADH, cpu.PC.ADL, expected_pc.ADH, expected_pc.ADL)
+	    }
+	    if cpu.SP.Value == element.expected_sp {
+	      t.Logf("Got the expected result SP 0x01%02x", cpu.SP.Value)
+	    }else {
+	      t.Errorf("There was a problem with the SP, got 0x01%02x expected 0x01%02x", cpu.SP.Value, element.expected_sp)
+	    }
+	    if b3.ADH == mapper.Read(addr_h.ADH, addr_h.ADL) {
+	      t.Logf("Got the expected result MEM[0x01%02x]:0x%02x", addr_h.ADL, mapper.Read(addr_h.ADH, addr_h.ADL))
+	    }else {
+	      t.Errorf("There was a problem with the result, got MEM[0x01%02x]:0x%02x expected MEM[0x01%02x]:0x%02x",
+	      addr_h.ADL, mapper.Read(addr_h.ADH, addr_h.ADL), addr_h.ADL, b3.ADH)
+	    }
+	    if b3.ADL == mapper.Read(addr_l.ADH, addr_l.ADL) {
+	      t.Logf("Got the expected result MEM[0x01%02x]:0x%02x", addr_l.ADL, mapper.Read(addr_l.ADH, addr_l.ADL))
+	    }else {
+	      t.Errorf("There was a problem with the result, got MEM[0x01%02x]:0x%02x expected MEM[0x01%02x]:0x%02x",
+	      addr_l.ADL, mapper.Read(addr_l.ADH, addr_l.ADL), addr_l.ADL, b3.ADL)
+	    }
+	  }
+	}
+}
+
 func TestExecuteBranch(t *testing.T) {
 	mapper := new(mappers.NoMapper)
 	cpu := new(processor.CPU)
@@ -932,7 +992,7 @@ func TestExecuteBranch(t *testing.T) {
 		{processor.ProgramCounter{0x01, 0xFF}, addrValue{0x01, 0xFF, 0xFF}, true, processor.AddressBuffer{0x01, 0xFF}, 1},
 		{processor.ProgramCounter{0x01, 0x05}, addrValue{0x01, 0x05, 0xF6}, true, processor.AddressBuffer{0x00, 0xFC}, 2},
 	}
-	t.Log("Given the need to test the Absolute Address.")
+	t.Log("Given the need to test ExecuteBranch.")
 	{
 	  for _, element := range test_table {
 	    cpu.PC = element.pc
@@ -970,7 +1030,7 @@ func TestExecuteBIT(t *testing.T) {
 	}{
 	  {processor.Register{0b11000010}, addrValue{0x01, 0x00, 0xFF}, 0b11000000},
 	}
-	t.Log("Given the need to test the Absolute Address.")
+	t.Log("Given the need to test the ExecuteBIT.")
 	{
 	  for _, element := range test_table {
 	    cpu.A = element.A
