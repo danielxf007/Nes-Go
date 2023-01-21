@@ -1234,6 +1234,11 @@ func ExecuteBRK(cpu* CPU) {
   cpu.PC.ADH = 0xFF
 }
 
+func BRK(cpu* CPU) uint16 {
+  ExecuteBRK(cpu)
+  return 6
+}
+
 //BIT
 func updateFlagsBIT(cpu* CPU, result byte) {
 	if result == 0x00 {
