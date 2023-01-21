@@ -218,6 +218,9 @@ func init() {
 	//JMP
 	func_table[0x4C] = JMPAbsolute
 	func_table[0x6C] = CLV
+	//BIT
+	func_table[0x24] = BITZeroPage
+	func_table[0x2C] = BITAbsolute
 	//Branching
 	//BCC
 	func_table[0x90] = BCC
