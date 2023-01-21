@@ -1013,6 +1013,56 @@ func TestExecuteRTS(t *testing.T) {
 	}
 }
 
+func TestExecuteBRK(t *testing.T) {
+	mapper := new(mappers.NoMapper)
+	cpu := new(processor.CPU)
+	cpu.Mapper = mapper
+	var addr_l, addr_h, p_addr addrValue
+	var expected_pc processor.ProgramCounter
+	var test_table = []struct {
+	  sp byte
+	  addr_l addrValue
+	  addr_h addrValue
+	  p_addr addrValue
+	  expected_pc processor.ProgramCounter
+	  expected_sp byte
+	}{
+	  {0xFF, addrValue{0x01, 0xFF, 0x04}, addrValue{0x01, 0xFE, 0xFF}, addrValue{0x01, 0xFD, 0b00010000},
+	  processor.ProgramCounter{0xFF, 0xFE}, 0xFC},
+	}
+	t.Log("Given the need to test ExecuteBRK.")
+	{
+	  for _, element := range test_table {
+	    cpu.SP.Value = element.sp 
+	    expected_pc = element.expected_pc
+	    addr_l, addr_h, p_addr  = element.addr_l, element.addr_h, element.p_addr
+	    mapper.Write(addr_l.ADH, addr_l.ADL, addr_l.Value)
+	    mapper.Write(addr_h.ADH, addr_h.ADL, addr_h.Value)
+	    mapper.Write(p_addr.ADH, p_addr.ADL, p_addr.Value)
+	    t.Logf("Context PC:0x%02x%02x Mem[0x%02x%02x]:0x%02x Mem[0x%02x%02x]:0x%02x Mem[0x%02x%02x]:0x%02x",
+	    cpu.PC.ADH, cpu.PC.ADL, addr_h.ADH, addr_h.ADL, addr_h.Value, addr_l.ADH, addr_l.ADL, addr_l.Value,
+	    p_addr.ADH, p_addr.ADL, p_addr.Value)
+	    processor.ExecuteBRK(cpu)
+	    if cpu.PC.ADH == expected_pc.ADH && cpu.PC.ADL == expected_pc.ADL {
+	      t.Logf("Got the expected result PC 0x%02x%02x", cpu.PC.ADH, cpu.PC.ADL)
+	    }else {
+	      t.Errorf("There was a problem with the PC, got 0x%02x%02x expected 0x%02x%02x", 
+	      cpu.PC.ADH, cpu.PC.ADL, expected_pc.ADH, expected_pc.ADL)
+	    }
+	    if cpu.SP.Value == element.expected_sp {
+	      t.Logf("Got the expected result SP 0x01%02x", cpu.SP.Value)
+	    }else {
+	      t.Errorf("There was a problem with the SP, got 0x01%02x expected 0x01%02x", cpu.SP.Value, element.expected_sp)
+	    }
+	    if mapper.Read(p_addr.ADH, p_addr.ADL) == p_addr.Value {
+	      t.Logf("Got the expected result P:%08b", p_addr.Value)
+	    }else {
+	      t.Errorf("There was a problem with P, got %08b expected %08b", cpu.P.Value, p_addr.Value)
+	    }
+	  }
+	}
+}
+
 func TestExecuteBranch(t *testing.T) {
 	mapper := new(mappers.NoMapper)
 	cpu := new(processor.CPU)
