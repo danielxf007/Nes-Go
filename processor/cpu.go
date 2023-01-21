@@ -220,6 +220,8 @@ func init() {
 	func_table[0x6C] = CLV
 	//JSR
 	func_table[0x20] = JSR
+	//RTS
+	func_table[0x60] = RTS
 	//BIT
 	func_table[0x24] = BITZeroPage
 	func_table[0x2C] = BITAbsolute
