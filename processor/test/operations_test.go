@@ -958,3 +958,32 @@ func TestExecuteBranch(t *testing.T) {
 	}
 }
 
+func TestExecuteBIT(t *testing.T) {
+	mapper := new(mappers.NoMapper)
+	cpu := new(processor.CPU)
+	cpu.Mapper = mapper
+	var value  addrValue
+	var test_table = []struct {
+	  A processor.Register
+	  value addrValue
+	  flags_f byte
+	}{
+	  {processor.Register{0b11000010}, addrValue{0x01, 0x00, 0xFF}, 0b11000000},
+	}
+	t.Log("Given the need to test the Absolute Address.")
+	{
+	  for _, element := range test_table {
+	    cpu.A = element.A
+	    value = element.value
+	    cpu.Addr.ADH, cpu.Addr.ADL = value.ADH, value.ADL
+	    mapper.Write(value.ADH, value.ADL, value.Value)
+	    t.Logf("Context A:%08b Mem[0x%02x%02x]:%08b", cpu.A.Value, value.ADH, value.ADL, value.Value)
+	    processor.ExecuteBIT(cpu)
+	    if cpu.P.Value == element.flags_f {
+	      t.Logf("Got the expected result P:%08b", cpu.P.Value)
+	    }else {
+	      t.Errorf("There was a problem with P, got %08b expected %08b", cpu.P.Value, element.flags_f)
+	    }
+	  }
+	}
+}
