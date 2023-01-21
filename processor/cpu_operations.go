@@ -1193,6 +1193,36 @@ func JMPIndirect(cpu* CPU) uint16 {
 	return 5
 }
 
+
+//BIT
+func updateFlagsBIT(cpu* CPU, result byte) {
+	if result == 0x00 {
+		cpu.P.SetFlagZ(1)
+	}else {
+		cpu.P.SetFlagZ(0)
+	}
+	cpu.P.SetFlagV(GetNBit(result, 6))
+	cpu.P.SetFlagN(GetNBit(result, 7))
+}
+
+func ExecuteBIT(cpu* CPU) {
+  value := cpu.Mapper.Read(cpu.Addr.ADH, cpu.Addr.ADL)
+  updateFlagsBIT(cpu, (cpu.A.Value & value))
+  cpu.PC.Increment(1)
+}
+
+func BITZeroPage(cpu* CPU) uint16 {
+  GetZeroPageAddr(cpu)
+  ExecuteBIT(cpu)
+	return 3
+}
+
+func BITAbsolute(cpu* CPU) uint16 {
+	GetAbsoluteAddr(cpu)
+  ExecuteBIT(cpu)
+	return 4
+}
+
 //Branching
 func ExecuteBranch(cpu* CPU, flag_cond bool) uint16 {
   offset := cpu.Mapper.Read(cpu.PC.ADH, cpu.PC.ADL)
