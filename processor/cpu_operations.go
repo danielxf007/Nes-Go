@@ -1239,6 +1239,17 @@ func BRK(cpu* CPU) uint16 {
   return 6
 }
 
+//RTI
+func ExecuteRTI(cpu* CPU) {
+  cpu.PC.ADL = ExecutePull(cpu)
+  cpu.PC.ADH = ExecutePull(cpu)
+}
+
+func RTI(cpu* CPU) uint16 {
+  ExecuteRTI(cpu)
+  return 6
+}
+
 //BIT
 func updateFlagsBIT(cpu* CPU, result byte) {
 	if result == 0x00 {
