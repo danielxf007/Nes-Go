@@ -39,6 +39,8 @@ var func_table [0xFF]func(cpu* CPU) uint16
 
 func init() {
 	func_table = [0xFF]func(cpu* CPU) uint16{}
+	//NOP
+	func_table[0xEA] = NOP
 	//Arithmetic
 	//ADC
 	func_table[0x69] = ADCImmediate
