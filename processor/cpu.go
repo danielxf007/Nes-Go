@@ -7,6 +7,13 @@ type AddressBuffer struct {
 	ADH byte
 	ADL byte
 }
+
+func (addr* AddressBuffer) Increment(value byte) uint16 {
+	carry := byte((uint16(addr.ADL) + uint16(value)) >> 8)
+	addr.ADL += value
+	addr.ADH += carry
+	return uint16(carry)
+}
  
 type CPU struct {
 	A Register
