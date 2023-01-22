@@ -1063,6 +1063,47 @@ func TestExecuteBRK(t *testing.T) {
 	}
 }
 
+func TestExecuteRTI(t *testing.T) {
+	mapper := new(mappers.NoMapper)
+	cpu := new(processor.CPU)
+	cpu.Mapper = mapper
+	var addr_l, addr_h addrValue
+	var expected_pc processor.ProgramCounter
+	var test_table = []struct {
+	  sp byte
+	  addr_l addrValue
+	  addr_h addrValue
+	  expected_pc processor.ProgramCounter
+	  expected_sp byte
+	}{
+	  {0xFD, addrValue{0x01, 0xFF, 0x04}, addrValue{0x01, 0xFE, 0xFF}, processor.ProgramCounter{0x04, 0xFF}, 0xFF},
+	}
+	t.Log("Given the need to test the ExecuteRTI.")
+	{
+	  for _, element := range test_table {
+	    cpu.SP.Value = element.sp 
+	    expected_pc = element.expected_pc
+	    addr_l, addr_h  = element.addr_l, element.addr_h
+	    mapper.Write(addr_l.ADH, addr_l.ADL, addr_l.Value)
+	    mapper.Write(addr_h.ADH, addr_h.ADL, addr_h.Value)
+	    t.Logf("Context PC:0x%02x%02x Mem[0x%02x%02x]:0x%02x Mem[0x%02x%02x]:0x%02x",
+	    cpu.PC.ADH, cpu.PC.ADL, addr_h.ADH, addr_h.ADL, addr_h.Value, addr_l.ADH, addr_l.ADL, addr_l.Value)
+	    processor.ExecuteRTI(cpu)
+	    if cpu.PC.ADH == expected_pc.ADH && cpu.PC.ADL == expected_pc.ADL {
+	      t.Logf("Got the expected result PC 0x%02x%02x", cpu.PC.ADH, cpu.PC.ADL)
+	    }else {
+	      t.Errorf("There was a problem with the PC, got 0x%02x%02x expected 0x%02x%02x", 
+	      cpu.PC.ADH, cpu.PC.ADL, expected_pc.ADH, expected_pc.ADL)
+	    }
+	    if cpu.SP.Value == element.expected_sp {
+	      t.Logf("Got the expected result SP 0x01%02x", cpu.SP.Value)
+	    }else {
+	      t.Errorf("There was a problem with the SP, got 0x01%02x expected 0x01%02x", cpu.SP.Value, element.expected_sp)
+	    }
+	  }
+	}
+}
+
 func TestExecuteBranch(t *testing.T) {
 	mapper := new(mappers.NoMapper)
 	cpu := new(processor.CPU)
