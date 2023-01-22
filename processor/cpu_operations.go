@@ -1,5 +1,9 @@
 package processor
 
+//NOP
+func NOP(cpu* CPU) uint16 {
+  return 2
+}
 //Arithmetic
 
 //ADC
