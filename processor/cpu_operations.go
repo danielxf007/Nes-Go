@@ -1339,12 +1339,3 @@ func BVS(cpu* CPU) uint16 {
   cycles := ExecuteBranch(cpu, cpu.P.GetFlagV() == 1)
   return 2 + cycles
 }
-
-func (cpu* CPU) Execute(n_cycles uint16) {
-	var current_cycles uint16 = 0
-	for current_cycles < n_cycles {
-		op_code := cpu.Mapper.Read(cpu.PC.ADH, cpu.PC.ADL)
-		cpu.PC.Increment(1)
-		current_cycles += func_table[op_code](cpu)
-	}
-}
