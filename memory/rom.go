@@ -6,7 +6,6 @@ import (
 )
 
 type RomHeader struct {
-	File_type []byte
 	PGR byte
 	CHR byte
 	Flags_6 byte
@@ -14,7 +13,6 @@ type RomHeader struct {
 	PGR_ram_sz byte
 	Flags_9 byte
 	Flags_10 byte
-	Unused [5]byte
 }
 
 type RomOperations interface {
@@ -34,7 +32,8 @@ type RomOperations interface {
 
 type Rom struct {
 	Header RomHeader
-	Data []byte
+	PGR_banks [][]byte
+	CHR_banks [][]byte
 }
 
 //Check if the file has at least a header
@@ -55,7 +54,7 @@ func (rom* Rom) hasUnusedBytes(unused_bytes []byte) bool {
 		}
 	}
 	return true
-} 
+}
 
 //Read and load the content of a rom file 
 func (rom* Rom) Load(rom_path string) error {
@@ -73,10 +72,32 @@ func (rom* Rom) Load(rom_path string) error {
 		return errors.New("Bytes from 8 to 15 must be 0x00")
 	}
 	rom.Header = RomHeader {
-		File_type: data[0:4], PGR: data[4], CHR: data[5], Flags_6: data[6],
+		PGR: data[4], CHR: data[5], Flags_6: data[6],
 		Flags_7: data[7], PGR_ram_sz: data[8], Flags_9: data[9], Flags_10: data[10],
 	}
-	rom.Data = data
+	var start, end, offset, pgr_unit_sz, chr_unit_sz uint32
+	pgr_unit_sz = 0x4000
+	rom.PGR_banks = make([][]byte, rom.Header.PGR)
+	for index := range rom.PGR_banks {
+	  rom.PGR_banks[index] = make([]byte, pgr_unit_sz)
+	}
+	offset = 16
+	for index := range rom.PGR_banks {
+	    start = (uint32(index)*pgr_unit_sz) + offset
+	    end = start + pgr_unit_sz
+	    rom.PGR_banks[index] = data[start:end]
+	}
+	chr_unit_sz = 0x2000
+	rom.CHR_banks = make([][]byte, rom.Header.CHR)
+	for index := range rom.CHR_banks {
+	  rom.CHR_banks[index] = make([]byte, chr_unit_sz)
+	}
+	offset = (pgr_unit_sz*uint32(rom.Header.PGR)) + 16
+	for index := range rom.CHR_banks {
+	    start = (uint32(index)*chr_unit_sz) + offset
+	    end = start + chr_unit_sz
+	    rom.CHR_banks[index] = data[start:end]
+	}
 	return nil
 }
 
